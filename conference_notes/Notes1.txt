@@ -1,1 +1,12 @@
-# FOSS4G 2014 
+# FOSS4G 2014
+
+
+# Mike Bostock -- Keynote
+ - Check out his lets make a bubble map (suggested in talk) http://bost.ocks.org/mike/bubble-map/
+ - he and Jason Davies have worked out many of the meridian issues in TopoJSOn and D3.  We need to look into these for when we are developing tools for researchers to exploit or interact with data.
+ 	- he brought up the issue we deal with regularly with the NAD 1983 Alaska Albers where Russia has a slice across it.  This can be solved with the tools available in TopoJSON
+
+
+# 10 am session on the Forest Mapping and Raster Viz
+
+
