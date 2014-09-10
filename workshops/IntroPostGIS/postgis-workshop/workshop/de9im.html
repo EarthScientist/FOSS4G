@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="en-US" prefix="og: http://ogp.me/ns#">
+<head>
+  <meta charset="UTF-8">
+  
+  <title>Boundless : Introduction to PostGIS : Section 23: Dimensionally Extended 9-Intersection Model</title>
+
+  <link rel="profile" href="http://gmpg.org/xfn/11">
+  <link rel="stylesheet" href="http://boundlessgeo.com/wp-content/themes/open-geo/style.css" type="text/css"/>
+
+<link rel="stylesheet" id="style-css" href="http://boundlessgeo.com/wp-content/themes/open-geo/style.css?ver=3.6.1" type="text/css" media="all">
+  <link rel="stylesheet" href="_static/extra.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <!-- <link rel="stylesheet" type="text/css" href="http://opengeo.org/include/superfish/css/superfish.css" media="screen" /> -->
+
+  <script type="text/javascript" src="http://boundlessgeo.com/wordpress/wp-includes/js/jquery/jquery.js?ver=1.10.2"></script>
+  <script type="text/javascript" src="http://boundlessgeo.com/wordpress/wp-includes/js/jquery/jquery-migrate.min.js?ver=1.2.1"></script>
+
+  <script type="text/javascript">
+    var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '1.0',
+        COLLAPSE_MODINDEX: false,
+        FILE_SUFFIX: '.html'
+    };
+  </script>
+  <script type="text/javascript" src="_static/jquery.js"></script>
+  <script type="text/javascript" src="_static/underscore.js"></script>
+  <script type="text/javascript" src="_static/doctools.js"></script>
+  <script type="text/javascript" src="_static/searchtools.js"></script>
+  <script type="text/javascript" src="searchindex.js"></script>
+  <!-- 
+  <script type="text/javascript" src="http://opengeo.org/include/superfish/js/jquery-1.2.6.min.js"></script> 
+  <script type="text/javascript" src="http://opengeo.org/include/superfish/js/hoverIntent.js"></script>
+  <script type="text/javascript" src="http://opengeo.org/include/superfish/js/superfish.js"></script>
+  <script type="text/javascript" src="http://opengeo.org/include/superfish/js/supersubs.js"></script>
+  <script>
+	$(document).ready(function(){
+		$("ul.sf-menu").supersubs({
+		}).superfish();  // call supersubs first, then superfish, so that subs are
+						 // not display:none when measuring. Call before initialising
+						 // containing tabs for same reason.
+	});
+	</script>
+  -->
+  <link rel="shortcut icon" href="_static/favicon.ico"/>
+      <link rel="top" title="Introduction to PostGIS" href="index.html" />
+      <link rel="next" title="Section 24: Clustering on Indices" href="clusterindex.html" />
+      <link rel="prev" title="Section 22: Linear Referencing" href="linear_referencing.html" />
+
+<script type="text/javascript" src="//use.typekit.net/ijz1lwt.js"></script>
+<script type="text/javascript">try{Typekit.load();}catch(e){}</script>
+
+<!--[if lt IE 9]>
+<script src="http://boundlessgeo.com/wp-content/themes/open-geo/js/html5.js" type="text/javascript"></script>
+<![endif]-->
+
+
+</head>
+<body class="page">
+
+	<div id="wrapper">
+		<header id="masthead" class="site-header" role="banner">
+			<div class="container">
+				<a href="http://boundlessgeo.com/" rel="home" id="logo"><img src="http://boundlessgeo.com/wp-content/themes/open-geo/images/logo.png"></a>
+
+				<div class="pull-right">
+					<div class="pull-left">
+						<div class="menu-main-container">
+							<ul id="menu-main" class="menu">
+                <li class="solutions-primary menu-item menu-item-type-post_type menu-item-object-page menu-item-22"><a href="http://boundlessgeo.com/solutions/">Solutions</a></li>
+                <li class="resources-primary menu-item menu-item-type-post_type menu-item-object-page current-menu-item page_item page-item-16 current_page_item menu-item-23"><a href="http://boundlessgeo.com/resources/">Resources</a></li>
+                <li class="about-primary menu-item menu-item-type-post_type menu-item-object-page menu-item-24"><a href="http://boundlessgeo.com/about/">About</a></li>
+                <li class="support-primary menu-item menu-item-type-post_type menu-item-object-page menu-item-25"><a href="http://boundlessgeo.com/support/">Support</a></li>
+							</ul>
+						</div>
+					</div>
+					<div class="search dropdown">
+					  <a class="dropdown-toggle" data-toggle="dropdown" href="#"><i class="search-icon"></i></a>
+						  <div class="dropdown-menu" role="menu" aria-labelledby="dLabel">
+							  <form method="get" id="searchform" class="searchform" action="http://boundlessgeo.com/" role="search">
+								  <label for="s" class="screen-reader-text">Search</label>
+							  <input type="search" class="field" name="s" value="" id="s" placeholder="Search …">
+							  <input type="submit" class="submit" id="searchsubmit" value="Search">
+							  </form>
+						  </div>
+					</div>
+					<div class="download-link">
+						<ul id="menu-download-link" class="menu">
+							<li id="menu-item-5817" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-5817">
+								<a href="http://boundlessgeo.com/download/">Download</a>
+							</li>
+						</ul>
+					</div>
+				</div>
+
+			</div><!--closes container-->
+
+		</header>
+<section class="resources page-resources">
+  <div class="secondarynav">
+     <div class="container">
+       	<div class="menu-resources-container">
+	   <ul id="menu-resources" class="menu">
+              <li id="menu-item-5892" class="menu-item menu-item-type-post_type menu-item-object-page current-menu-item page_item page-item-16 current_page_item menu-item-5892"><a href="http://boundlessgeo.com/resources/" >Overview</a></li>
+              <li id="menu-item-7099" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-7099"><a href="http://boundlessgeo.com/resources/documentation/" >Documentation</a></li>
+              <li id="menu-item-5885" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-5885"><a href="http://boundlessgeo.com/resources/trainings/" >Trainings</a></li>
+              <li id="menu-item-6432" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-6432"><a href="http://workshops.boundlessgeo.com/" >Workshops</a></li>
+              <li id="menu-item-5318" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-5318"><a href="http://boundlessgeo.com/resources/case-studies/" >Case Studies</a></li>
+              <li id="menu-item-5891" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-5891"><a href="http://boundlessgeo.com/resources/white-papers/" >White Papers</a></li>
+           </ul>
+         </div>		
+      </div>
+    </div>
+</section>
+<header class="page-header">
+	<div class="container">
+		<h1 class="page-title"><a href="index.html">Introduction to PostGIS</a></h1>
+		<p>PostGIS extends PostgreSQL with robust spatial database management capabilities. <a href="http://boundlessgeo.com/solutions/solutions-software/postgis/">More info</a></p>
+	</div>
+</header><div id="pageheading"><div class="contents"><h1>Introduction to PostGIS</h1></div></div>
+
+  <div id="content" class="contents">
+  <!--
+<div id="breadcrumbs">
+  <a href="http://boundlessgeo.com/">Home</a> &raquo;
+  <a href="http://boundlessgeo.com/resources/">Resources</a> &raquo;
+  <a href="http://workshops.boundlessgeo.com/">Workshops</a> &raquo;
+  <a href="index.html">Introduction to PostGIS</a>
+  
+     &raquo; <a href="">Section 23: Dimensionally Extended 9-Intersection Model</a>
+</div> -->
+
+  <div id="rightbar_main">
+      
+  <div class="section" id="section-23-dimensionally-extended-9-intersection-model">
+<span id="de9im"></span><h1>Section 23: Dimensionally Extended 9-Intersection Model<a class="headerlink" href="#section-23-dimensionally-extended-9-intersection-model" title="Permalink to this headline">¶</a></h1>
+<p>The &#8220;<a class="reference external" href="http://en.wikipedia.org/wiki/DE-9IM">Dimensionally Extended 9-Intersection Model</a>&#8221; (DE9IM) is a framework for modelling how two spatial objects interact.</p>
+<p>First, every spatial object has:</p>
+<ul class="simple">
+<li>An interior</li>
+<li>A boundary</li>
+<li>An exterior</li>
+</ul>
+<p>For polygons, the interior, boundary and exterior are obvious:</p>
+<img alt="_images/de9im1.jpg" class="inline" src="_images/de9im1.jpg" />
+<p>The interior is the part bounded by the rings; the boundary is the rings themselves; the exterior is everything else in the plane.</p>
+<p>For linear features, the interior, boundary and exterior are less well-known:</p>
+<img alt="_images/de9im2.jpg" class="inline" src="_images/de9im2.jpg" />
+<p>The interior is the part of the line bounded by the ends; the boundary is the ends of the linear feature, and the exterior is everything else in the plane.</p>
+<p>For points, things are even stranger: the interior is the point; the boundary is the empty set and the exterior is everything else in the plane.</p>
+<p>Using these definitions of interior, exterior and boundary, the relationships between any pair of spatial features can be characterized using the dimensionality of the nine possible intersections between the interiors/boundaries/exteriors of a pair of objects.</p>
+<img alt="_images/de9im3.jpg" class="inline" src="_images/de9im3.jpg" />
+<p>For the polygons in the example above, the intersection of the interiors is a 2-dimensional area, so that portion of the matrix is filled out with a &#8220;2&#8221;. The boundaries only intersect at points, which are zero-dimensional, so that portion of the matrix is filled out with a 0.</p>
+<p>When there is no intersection between components, the square the matrix is filled out with an &#8220;F&#8221;.</p>
+<p>Here&#8217;s another example, of a linestring partially entering a polygon:</p>
+<img alt="_images/de9im4.jpg" class="inline" src="_images/de9im4.jpg" />
+<p>The DE9IM matrix for the interaction is this:</p>
+<img alt="_images/de9im5.jpg" class="inline" src="_images/de9im5.jpg" />
+<p>Note that the boundaries of the two objects don&#8217;t actually intersect at all (the end point of the line interacts with the interior of the polygon, not the boundary, and vice versa), so the B/B cell is filled in with an &#8220;F&#8221;.</p>
+<p>While it&#8217;s fun to visually fill out DE9IM matrices, it would be nice if a computer could do it, and that&#8217;s what the <strong class="command">ST_Relate</strong> function is for.</p>
+<p>The previous example can be simplified using a simple box and line, with the same spatial relationship as our polygon and linestring:</p>
+<img alt="_images/de9im6.jpg" class="inline" src="_images/de9im6.jpg" />
+<p>And we can generate the DE9IM information in SQL:</p>
+<div class="highlight-sql"><div class="highlight"><pre><span class="k">SELECT</span> <span class="n">ST_Relate</span><span class="p">(</span>
+         <span class="s1">&#39;LINESTRING(0 0, 2 0)&#39;</span><span class="p">,</span>
+         <span class="s1">&#39;POLYGON((1 -1, 1 1, 3 1, 3 -1, 1 -1))&#39;</span>
+       <span class="p">);</span>
+</pre></div>
+</div>
+<p>The answer (1010F0212) is the same as we calculated visually, but returned as a 9-character string, with the first row, second row and third row of the table appended together.</p>
+<div class="highlight-python"><pre>101
+0F0
+212</pre>
+</div>
+<p>However, the power of DE9IM matrices is not in generating them, but in using them as a matching key to find geometries with very specific relationships to one another.</p>
+<div class="highlight-sql"><div class="highlight"><pre><span class="k">CREATE</span> <span class="k">TABLE</span> <span class="n">lakes</span> <span class="p">(</span> <span class="n">id</span> <span class="nb">serial</span> <span class="k">primary</span> <span class="k">key</span><span class="p">,</span> <span class="n">geom</span> <span class="n">geometry</span> <span class="p">);</span>
+<span class="k">CREATE</span> <span class="k">TABLE</span> <span class="n">docks</span> <span class="p">(</span> <span class="n">id</span> <span class="nb">serial</span> <span class="k">primary</span> <span class="k">key</span><span class="p">,</span> <span class="n">good</span> <span class="nb">boolean</span><span class="p">,</span> <span class="n">geom</span> <span class="n">geometry</span> <span class="p">);</span>
+
+<span class="k">INSERT</span> <span class="k">INTO</span> <span class="n">lakes</span> <span class="p">(</span> <span class="n">geom</span> <span class="p">)</span>
+  <span class="k">VALUES</span> <span class="p">(</span> <span class="s1">&#39;POLYGON ((100 200, 140 230, 180 310, 280 310, 390 270, 400 210, 320 140, 215 141, 150 170, 100 200))&#39;</span><span class="p">);</span>
+
+<span class="k">INSERT</span> <span class="k">INTO</span> <span class="n">docks</span> <span class="p">(</span> <span class="n">geom</span><span class="p">,</span> <span class="n">good</span> <span class="p">)</span>
+  <span class="k">VALUES</span>
+        <span class="p">(</span><span class="s1">&#39;LINESTRING (170 290, 205 272)&#39;</span><span class="p">,</span><span class="k">true</span><span class="p">),</span>
+        <span class="p">(</span><span class="s1">&#39;LINESTRING (120 215, 176 197)&#39;</span><span class="p">,</span><span class="k">true</span><span class="p">),</span>
+        <span class="p">(</span><span class="s1">&#39;LINESTRING (290 260, 340 250)&#39;</span><span class="p">,</span><span class="k">false</span><span class="p">),</span>
+        <span class="p">(</span><span class="s1">&#39;LINESTRING (350 300, 400 320)&#39;</span><span class="p">,</span><span class="k">false</span><span class="p">),</span>
+        <span class="p">(</span><span class="s1">&#39;LINESTRING (370 230, 420 240)&#39;</span><span class="p">,</span><span class="k">false</span><span class="p">),</span>
+        <span class="p">(</span><span class="s1">&#39;LINESTRING (370 180, 390 160)&#39;</span><span class="p">,</span><span class="k">false</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>Suppose we have a data model that includes <strong>Lakes</strong> and <strong>Docks</strong>, and suppose further that Docks must be inside lakes, and must touch the boundary of their containing lake at one end. Can we find all the docks in our database that obey that rule?</p>
+<img alt="_images/de9im7.jpg" class="inline" src="_images/de9im7.jpg" />
+<p>Our legal docks have the following characteristics:</p>
+<ul class="simple">
+<li>Their interiors have a linear (1D) intersection with the lake interior</li>
+<li>Their boundaries have a point (0D) intersection with the lake interior</li>
+<li>Their boundaries <strong>also</strong> have a point (0D) intersection with the lake boundary</li>
+<li>Their interiors have no intersection (F) with the lake exterior</li>
+</ul>
+<p>So their DE9IM matrix looks like this:</p>
+<img alt="_images/de9im8.jpg" class="inline" src="_images/de9im8.jpg" />
+<p>So to find all the legal docks, we would want to find all the docks that intersect lakes (a super-set of <strong>potential</strong> candidates we use for our join key), and then find all the docks in that set which have the legal relate pattern.</p>
+<div class="highlight-sql"><div class="highlight"><pre><span class="k">SELECT</span> <span class="n">docks</span><span class="p">.</span><span class="o">*</span>
+<span class="k">FROM</span> <span class="n">docks</span> <span class="k">JOIN</span> <span class="n">lakes</span> <span class="k">ON</span> <span class="n">ST_Intersects</span><span class="p">(</span><span class="n">docks</span><span class="p">.</span><span class="n">geom</span><span class="p">,</span> <span class="n">lakes</span><span class="p">.</span><span class="n">geom</span><span class="p">)</span>
+<span class="k">WHERE</span> <span class="n">ST_Relate</span><span class="p">(</span><span class="n">docks</span><span class="p">.</span><span class="n">geom</span><span class="p">,</span> <span class="n">lakes</span><span class="p">.</span><span class="n">geom</span><span class="p">,</span> <span class="s1">&#39;1FF00F212&#39;</span><span class="p">);</span>
+
+<span class="c1">-- Answer: our two good docks</span>
+</pre></div>
+</div>
+<p>Note the use of the three-parameter version of <strong class="command">ST_Relate</strong>, which returns true if the pattern matches or false if it does not. For a fully-defined pattern like this one, the three-parameter version is not needed &#8211; we could have just used a string equality operator.</p>
+<p>However, for looser pattern searches, the three-parameter allows substitution characters in the pattern string:</p>
+<ul class="simple">
+<li>&#8220;*&#8221; means &#8220;any value in this cell is acceptable&#8221;</li>
+<li>&#8220;T&#8221; means &#8220;any non-false value (0, 1 or 2) is acceptable&#8221;</li>
+</ul>
+<p>So for example, one possible dock we did not include in our example graphic is a dock with a two-dimensional intersection with the lake boundary:</p>
+<div class="highlight-sql"><div class="highlight"><pre><span class="k">INSERT</span> <span class="k">INTO</span> <span class="n">docks</span> <span class="p">(</span> <span class="n">geom</span><span class="p">,</span> <span class="n">good</span> <span class="p">)</span>
+  <span class="k">VALUES</span> <span class="p">(</span><span class="s1">&#39;LINESTRING (140 230, 150 250, 210 230)&#39;</span><span class="p">,</span><span class="k">true</span><span class="p">);</span>
+</pre></div>
+</div>
+<img alt="_images/de9im9.jpg" class="inline" src="_images/de9im9.jpg" />
+<p>If we are to include this case in our set of &#8220;legal&#8221; docks, we need to change the relate pattern in our query. In particular, the intersection of the dock interior lake boundary can now be either 1 (our new case) or F (our original case). So we use the &#8220;*&#8221; catchall in the pattern.</p>
+<img alt="_images/de9im10.jpg" class="inline" src="_images/de9im10.jpg" />
+<p>And the SQL looks like this:</p>
+<div class="highlight-sql"><div class="highlight"><pre><span class="k">SELECT</span> <span class="n">docks</span><span class="p">.</span><span class="o">*</span>
+<span class="k">FROM</span> <span class="n">docks</span> <span class="k">JOIN</span> <span class="n">lakes</span> <span class="k">ON</span> <span class="n">ST_Intersects</span><span class="p">(</span><span class="n">docks</span><span class="p">.</span><span class="n">geom</span><span class="p">,</span> <span class="n">lakes</span><span class="p">.</span><span class="n">geom</span><span class="p">)</span>
+<span class="k">WHERE</span> <span class="n">ST_Relate</span><span class="p">(</span><span class="n">docks</span><span class="p">.</span><span class="n">geom</span><span class="p">,</span> <span class="n">lakes</span><span class="p">.</span><span class="n">geom</span><span class="p">,</span> <span class="s1">&#39;1*F00F212&#39;</span><span class="p">);</span>
+
+<span class="c1">-- Answer: our (now) three good docks</span>
+</pre></div>
+</div>
+<p>Confirm that the stricter SQL from the previous example does <em>not</em> return the new dock.</p>
+<div class="section" id="data-quality-testing">
+<h2>Data Quality Testing<a class="headerlink" href="#data-quality-testing" title="Permalink to this headline">¶</a></h2>
+<p>The TIGER data is carefully quality controlled when it is prepared, so we expect our data to meet strict standards. For example: no census block should overlap any other census block. Can we test for that?</p>
+<img alt="_images/de9im11.jpg" class="inline" src="_images/de9im11.jpg" />
+<p>Sure!</p>
+<div class="highlight-sql"><div class="highlight"><pre><span class="k">SELECT</span> <span class="n">a</span><span class="p">.</span><span class="n">gid</span><span class="p">,</span> <span class="n">b</span><span class="p">.</span><span class="n">gid</span>
+<span class="k">FROM</span> <span class="n">nyc_census_blocks</span> <span class="n">a</span><span class="p">,</span> <span class="n">nyc_census_blocks</span> <span class="n">b</span>
+<span class="k">WHERE</span> <span class="n">ST_Intersects</span><span class="p">(</span><span class="n">a</span><span class="p">.</span><span class="n">geom</span><span class="p">,</span> <span class="n">b</span><span class="p">.</span><span class="n">geom</span><span class="p">)</span>
+  <span class="k">AND</span> <span class="n">ST_Relate</span><span class="p">(</span><span class="n">a</span><span class="p">.</span><span class="n">geom</span><span class="p">,</span> <span class="n">b</span><span class="p">.</span><span class="n">geom</span><span class="p">,</span> <span class="s1">&#39;2********&#39;</span><span class="p">)</span>
+  <span class="k">AND</span> <span class="n">a</span><span class="p">.</span><span class="n">gid</span> <span class="o">!=</span> <span class="n">b</span><span class="p">.</span><span class="n">gid</span>
+<span class="k">LIMIT</span> <span class="mi">10</span><span class="p">;</span>
+
+<span class="c1">-- Answer: 10, there&#39;s some funny business</span>
+</pre></div>
+</div>
+<p>Similarly, we would expect that the roads data is all end-noded. That is, we expect that intersections only occur at the ends of lines, not at the mid-points.</p>
+<img alt="_images/de9im12.jpg" class="inline" src="_images/de9im12.jpg" />
+<p>We can test for that by looking for streets that intersect (so we have a join) but where the intersection between the boundaries is not zero-dimensional (that is, the end points don&#8217;t touch):</p>
+<div class="highlight-sql"><div class="highlight"><pre><span class="k">SELECT</span> <span class="n">a</span><span class="p">.</span><span class="n">gid</span><span class="p">,</span> <span class="n">b</span><span class="p">.</span><span class="n">gid</span>
+<span class="k">FROM</span> <span class="n">nyc_streets</span> <span class="n">a</span><span class="p">,</span> <span class="n">nyc_streets</span> <span class="n">b</span>
+<span class="k">WHERE</span> <span class="n">ST_Intersects</span><span class="p">(</span><span class="n">a</span><span class="p">.</span><span class="n">geom</span><span class="p">,</span> <span class="n">b</span><span class="p">.</span><span class="n">geom</span><span class="p">)</span>
+  <span class="k">AND</span> <span class="k">NOT</span> <span class="n">ST_Relate</span><span class="p">(</span><span class="n">a</span><span class="p">.</span><span class="n">geom</span><span class="p">,</span> <span class="n">b</span><span class="p">.</span><span class="n">geom</span><span class="p">,</span> <span class="s1">&#39;****0****&#39;</span><span class="p">)</span>
+  <span class="k">AND</span> <span class="n">a</span><span class="p">.</span><span class="n">gid</span> <span class="o">!=</span> <span class="n">b</span><span class="p">.</span><span class="n">gid</span>
+<span class="k">LIMIT</span> <span class="mi">10</span><span class="p">;</span>
+
+<span class="c1">-- Answer: This happens, so the data is not end-noded.</span>
+</pre></div>
+</div>
+<div class="section" id="function-list">
+<h3>Function List<a class="headerlink" href="#function-list" title="Permalink to this headline">¶</a></h3>
+<p><a class="reference external" href="http://postgis.net/docs/manual-2.1/ST_Relate.html">ST_Relate(geometry A, geometry B)</a>: Returns a text string representing the DE9IM relationship between the geometries.</p>
+</div>
+</div>
+</div>
+
+
+      <!-- Next/Prev -->
+      <div class="selfclear pagination-nav">
+          <div class="left"><strong>Previous</strong>: <a href="linear_referencing.html" title="previous chapter">Section 22: Linear Referencing</a></div>
+          <div class="right"><strong>Next</strong>: <a href="clusterindex.html" title="next chapter">Section 24: Clustering on Indices</a></div>
+      </div>
+
+  </div> <!-- rightbar_main -->
+
+  <div id="rightbar_bar">
+    
+      <div id="toc" class="section">
+        <h4 class="pngfix">Page Contents</h4>
+        <ul>
+<li><a class="reference internal" href="#">Section 23: Dimensionally Extended 9-Intersection Model</a><ul>
+<li><a class="reference internal" href="#data-quality-testing">Data Quality Testing</a><ul>
+<li><a class="reference internal" href="#function-list">Function List</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+        <div class="section-footer"></div>
+      </div>
+        <div class="section">
+          <h3>Continue Reading</h3>
+          <p style="margin-top:1em"><b>Previous:</b> <a href="linear_referencing.html" title="previous chapter">Section 22: Linear Referencing</a></p>
+          <p><b>Next:</b> <a href="clusterindex.html" title="next chapter">Section 24: Clustering on Indices</a></p>
+          </ul>
+        </div>
+
+   <h4>About Boundless</h4>
+   <p>Boundless provides <a href="http://boundlessgeo.com/solutions/">commercial open source software</a> for internet mapping and geospatial application development. We are dedicated to the growth and support of open source software.</p>
+
+    <h4>License</h4>
+    <p>This work is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/3.0/">Creative Commons Non Commercial-Attribution-Share Alike 3.0 United States License</a>.  Feel free to use this material, but we ask that you please retain the Boundless branding, logos and style.</p>
+<p><a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/3.0/"><img alt="Creative Commons License" style="border-width:0" src="http://i.creativecommons.org/l/by-nc-sa/3.0/88x31.png" /></a></p>
+<!--
+<ul id="relatedlinks" class="selfclear">
+  <li class="first">
+    <a href="clusterindex.html" title="Section 24: Clustering on Indices"
+       accesskey="N">next</a></li>
+  <li>
+    <a href="linear_referencing.html" title="Section 22: Linear Referencing"
+       accesskey="P">previous</a>|</li>
+</ul> -->
+  </div> <!-- rightbar_bar -->
+
+  </div> <!-- content -->
+  <div id="footer">
+    <footer id="colophon" class="site-footer" role="contentinfo">
+		<div class="container">
+			<div class="row">
+				<div class="span2">
+					<h5>Solutions</h5>
+					<div class="footer-solutions-menu">
+						<ul id="menu-solutions" class="menu">
+							<li><a href="http://boundlessgeo.com/solutions/">Overview</a></li>
+							<li><a href="http://boundlessgeo.com/opengeo-suite/">OpenGeo Suite</a></li>
+							<li><a href="http://boundlessgeo.com/solutions/mapmeter/">MapMeter</a></li>
+							<li><a href="http://boundlessgeo.com/solutions/solutions-software/">Software</a></li>
+							<li><a href="http://boundlessgeo.com/solutions/solutions-industry/">Industries</a></li>
+						</ul>
+					</div>
+				</div>
+				<div class="span2">
+					<h5>Resources</h5>
+					<div class="footer-resources-menu">
+						<ul id="menu-resources" class="menu">
+              <li><a href="http://boundlessgeo.com/resources/">Overview</a></li>
+							<li><a href="http://boundlessgeo.com/documentation/">Documentation</a></li>
+							<li><a href="http://boundlessgeo.com/resources/trainings/">Trainings</a></li>
+							<li><a href="http://workshops.boundlessgeo.com/">Workshops</a></li>
+							<li><a href="http://boundlessgeo.com/case-studies/">Case Studies</a></li>
+							<li><a href="http://boundlessgeo.com/resources/white-papers/">White Papers</a></li>
+						</ul>
+					</div>
+				</div>
+				<div class="span2">
+					<h5>About Us</h5>
+					<div class="footer-about-menu">
+						<ul id="menu-about-menu" class="menu">
+              <li><a href="http://boundlessgeo.com/about/">Overview</a></li>
+							<li><a href="http://boundlessgeo.com/why-boundless/">Why Boundless</a></li>
+							<li><a href="http://boundlessgeo.com/about/team/">Team</a></li>
+							<li><a href="http://boundlessgeo.com/resources/careers/">Careers</a></li>
+							<li><a href="http://boundlessgeo.com/resources/partners/">Partners</a></li>
+							<li><a href="http://boundlessgeo.com/blog/">Blog</a></li>
+							<li><a href="http://boundlessgeo.com/resources/news/">News &amp; Media</a></li>
+              <li><a href="http://boundlessgeo.com/general-information/">Contact</a></li>
+            </ul></div>
+  				</div>
+
+				<div class="span6 site-info">
+
+					<div class="row-fluid">
+						<div class="span6">
+							<h5>Contact</h5>
+							<p class="address">
+								<span>155 Water Street, Suite 4-10</span>
+								<span>Brooklyn, NY 11201</span>
+								<span>1-877-673-6436</span>
+								<span>contact@boundlessgeo.com</span>
+							</p>
+						</div>
+						<div class="span6">
+							<span class="social"><i class="twitter"></i><a href="https://twitter.com/boundlessgeo" target="_blank">Follow us on Twitter</a></span>
+							<span class="social"><i class="linkedIn"></i><a href="http://www.linkedin.com/company/boundlessgeo" target="_blank">Follow us on Linkedin</a></span>
+						</div>
+					</div>
+
+				</div>
+			</div>
+			<div class="row">
+				<div class="span12 footer-sub-menu">
+					<div class="menu-footer-menu-container">
+						<ul id="menu-footer-menu" class="menu">
+							<li><a href="http://boundlessgeo.com/terms-service/">Terms of Service</a></li>
+							<li><a href="http://boundlessgeo.com/privacy-policy/">Privacy Policy</a></li>
+							<li><a href="http://boundlessgeo.com/site-map/">Site Map</a></li>
+							<li><a href="http://boundlessgeo.com/">© Boundless</a></li>
+						</ul>
+					</div>
+				</div>
+			</div>
+		</div>
+		<a class="question btn btn-primary" href="http://boundlessgeo.com/general-information/?contact-variable=ask_a_question"><i class="bubble"></i>Ask A Question</a>
+	</footer>
+  </div><!-- footer -->
+
+</div><!-- container -->
+
+<script type="text/javascript" src="http://boundlessgeo.com/wp-content/themes/open-geo/js/dropdown.js"></script>
+<script type="text/javascript">
+var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+</script>
+<script type="text/javascript">
+try {
+var pageTracker = _gat._getTracker("UA-3879903-6");
+pageTracker._trackPageview();
+} catch(err) {}
+</script>
+
+  </body>
+</html>

@@ -1,0 +1,24 @@
+Section 11:
+
+SELECT ST_AsText(geom)
+FROM nyc_streets
+WHERE name = 'Atlantic Commons';
+
+
+# # # # 
+
+SELECT name 
+FROM nyc_neighborhoods
+WHERE ST_Intersects(geom, ST_GeomFromText('LINESTRING(586782 4504202,586864 4504216)') );
+
+# # # #
+
+SELECT Sum(popn_total) 
+FROM nyc_census_blocks
+WHERE ST_DWithin(geom, ST_GeomFromText('POINT(586782 4504216)', 0), 50 );
+
+# # # #
+
+SELECT n.name, s.name
+FROM nyc_subway_stations AS s
+JOIN 

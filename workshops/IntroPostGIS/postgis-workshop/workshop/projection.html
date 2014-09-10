@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="en-US" prefix="og: http://ogp.me/ns#">
+<head>
+  <meta charset="UTF-8">
+  
+  <title>Boundless : Introduction to PostGIS : Section 15: Projecting Data</title>
+
+  <link rel="profile" href="http://gmpg.org/xfn/11">
+  <link rel="stylesheet" href="http://boundlessgeo.com/wp-content/themes/open-geo/style.css" type="text/css"/>
+
+<link rel="stylesheet" id="style-css" href="http://boundlessgeo.com/wp-content/themes/open-geo/style.css?ver=3.6.1" type="text/css" media="all">
+  <link rel="stylesheet" href="_static/extra.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <!-- <link rel="stylesheet" type="text/css" href="http://opengeo.org/include/superfish/css/superfish.css" media="screen" /> -->
+
+  <script type="text/javascript" src="http://boundlessgeo.com/wordpress/wp-includes/js/jquery/jquery.js?ver=1.10.2"></script>
+  <script type="text/javascript" src="http://boundlessgeo.com/wordpress/wp-includes/js/jquery/jquery-migrate.min.js?ver=1.2.1"></script>
+
+  <script type="text/javascript">
+    var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '1.0',
+        COLLAPSE_MODINDEX: false,
+        FILE_SUFFIX: '.html'
+    };
+  </script>
+  <script type="text/javascript" src="_static/jquery.js"></script>
+  <script type="text/javascript" src="_static/underscore.js"></script>
+  <script type="text/javascript" src="_static/doctools.js"></script>
+  <script type="text/javascript" src="_static/searchtools.js"></script>
+  <script type="text/javascript" src="searchindex.js"></script>
+  <!-- 
+  <script type="text/javascript" src="http://opengeo.org/include/superfish/js/jquery-1.2.6.min.js"></script> 
+  <script type="text/javascript" src="http://opengeo.org/include/superfish/js/hoverIntent.js"></script>
+  <script type="text/javascript" src="http://opengeo.org/include/superfish/js/superfish.js"></script>
+  <script type="text/javascript" src="http://opengeo.org/include/superfish/js/supersubs.js"></script>
+  <script>
+	$(document).ready(function(){
+		$("ul.sf-menu").supersubs({
+		}).superfish();  // call supersubs first, then superfish, so that subs are
+						 // not display:none when measuring. Call before initialising
+						 // containing tabs for same reason.
+	});
+	</script>
+  -->
+  <link rel="shortcut icon" href="_static/favicon.ico"/>
+      <link rel="top" title="Introduction to PostGIS" href="index.html" />
+      <link rel="next" title="Section 16: Projection Exercises" href="projection_exercises.html" />
+      <link rel="prev" title="Section 14: Spatial Indexing" href="indexing.html" />
+
+<script type="text/javascript" src="//use.typekit.net/ijz1lwt.js"></script>
+<script type="text/javascript">try{Typekit.load();}catch(e){}</script>
+
+<!--[if lt IE 9]>
+<script src="http://boundlessgeo.com/wp-content/themes/open-geo/js/html5.js" type="text/javascript"></script>
+<![endif]-->
+
+
+</head>
+<body class="page">
+
+	<div id="wrapper">
+		<header id="masthead" class="site-header" role="banner">
+			<div class="container">
+				<a href="http://boundlessgeo.com/" rel="home" id="logo"><img src="http://boundlessgeo.com/wp-content/themes/open-geo/images/logo.png"></a>
+
+				<div class="pull-right">
+					<div class="pull-left">
+						<div class="menu-main-container">
+							<ul id="menu-main" class="menu">
+                <li class="solutions-primary menu-item menu-item-type-post_type menu-item-object-page menu-item-22"><a href="http://boundlessgeo.com/solutions/">Solutions</a></li>
+                <li class="resources-primary menu-item menu-item-type-post_type menu-item-object-page current-menu-item page_item page-item-16 current_page_item menu-item-23"><a href="http://boundlessgeo.com/resources/">Resources</a></li>
+                <li class="about-primary menu-item menu-item-type-post_type menu-item-object-page menu-item-24"><a href="http://boundlessgeo.com/about/">About</a></li>
+                <li class="support-primary menu-item menu-item-type-post_type menu-item-object-page menu-item-25"><a href="http://boundlessgeo.com/support/">Support</a></li>
+							</ul>
+						</div>
+					</div>
+					<div class="search dropdown">
+					  <a class="dropdown-toggle" data-toggle="dropdown" href="#"><i class="search-icon"></i></a>
+						  <div class="dropdown-menu" role="menu" aria-labelledby="dLabel">
+							  <form method="get" id="searchform" class="searchform" action="http://boundlessgeo.com/" role="search">
+								  <label for="s" class="screen-reader-text">Search</label>
+							  <input type="search" class="field" name="s" value="" id="s" placeholder="Search …">
+							  <input type="submit" class="submit" id="searchsubmit" value="Search">
+							  </form>
+						  </div>
+					</div>
+					<div class="download-link">
+						<ul id="menu-download-link" class="menu">
+							<li id="menu-item-5817" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-5817">
+								<a href="http://boundlessgeo.com/download/">Download</a>
+							</li>
+						</ul>
+					</div>
+				</div>
+
+			</div><!--closes container-->
+
+		</header>
+<section class="resources page-resources">
+  <div class="secondarynav">
+     <div class="container">
+       	<div class="menu-resources-container">
+	   <ul id="menu-resources" class="menu">
+              <li id="menu-item-5892" class="menu-item menu-item-type-post_type menu-item-object-page current-menu-item page_item page-item-16 current_page_item menu-item-5892"><a href="http://boundlessgeo.com/resources/" >Overview</a></li>
+              <li id="menu-item-7099" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-7099"><a href="http://boundlessgeo.com/resources/documentation/" >Documentation</a></li>
+              <li id="menu-item-5885" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-5885"><a href="http://boundlessgeo.com/resources/trainings/" >Trainings</a></li>
+              <li id="menu-item-6432" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-6432"><a href="http://workshops.boundlessgeo.com/" >Workshops</a></li>
+              <li id="menu-item-5318" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-5318"><a href="http://boundlessgeo.com/resources/case-studies/" >Case Studies</a></li>
+              <li id="menu-item-5891" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-5891"><a href="http://boundlessgeo.com/resources/white-papers/" >White Papers</a></li>
+           </ul>
+         </div>		
+      </div>
+    </div>
+</section>
+<header class="page-header">
+	<div class="container">
+		<h1 class="page-title"><a href="index.html">Introduction to PostGIS</a></h1>
+		<p>PostGIS extends PostgreSQL with robust spatial database management capabilities. <a href="http://boundlessgeo.com/solutions/solutions-software/postgis/">More info</a></p>
+	</div>
+</header><div id="pageheading"><div class="contents"><h1>Introduction to PostGIS</h1></div></div>
+
+  <div id="content" class="contents">
+  <!--
+<div id="breadcrumbs">
+  <a href="http://boundlessgeo.com/">Home</a> &raquo;
+  <a href="http://boundlessgeo.com/resources/">Resources</a> &raquo;
+  <a href="http://workshops.boundlessgeo.com/">Workshops</a> &raquo;
+  <a href="index.html">Introduction to PostGIS</a>
+  
+     &raquo; <a href="">Section 15: Projecting Data</a>
+</div> -->
+
+  <div id="rightbar_main">
+      
+  <div class="section" id="section-15-projecting-data">
+<span id="projection"></span><h1>Section 15: Projecting Data<a class="headerlink" href="#section-15-projecting-data" title="Permalink to this headline">¶</a></h1>
+<p>The earth is not flat, and there is no simple way of putting it down on a flat paper map (or computer screen), so people have come up with all sorts of ingenious solutions, each with pros and cons. Some projections preserve area, so all objects have a relative size to each other; other projections preserve angles (conformal) like the Mercator projection; some projections try to find a good intermediate mix with only little distortion on several parameters. Common to all projections is that they transform the (spherical) world onto a flat cartesian coordinate system, and which projection to choose depends on how you will be using the data.</p>
+<p>We&#8217;ve already encountered projections when we <a class="reference internal" href="loading_data.html#loading-data"><em>loaded our nyc data</em></a>.  (Recall that pesky SRID 26918).  Sometimes, however, you need to transform and re-project between spatial reference systems. PostGIS includes built-in support for changing the projection of data, using the <strong class="command">ST_Transform(geometry, srid)</strong> function. For managing the spatial reference identifiers on geometries, PostGIS provides the <strong class="command">ST_SRID(geometry)</strong> and <strong class="command">ST_SetSRID(geometry, srid)</strong> functions.</p>
+<p>We can confirm the SRID of our data with the <strong class="command">ST_SRID</strong> command:</p>
+<div class="highlight-sql"><div class="highlight"><pre><span class="k">SELECT</span> <span class="n">ST_SRID</span><span class="p">(</span><span class="n">geom</span><span class="p">)</span> <span class="k">FROM</span> <span class="n">nyc_streets</span> <span class="k">LIMIT</span> <span class="mi">1</span><span class="p">;</span>
+</pre></div>
+</div>
+<div class="highlight-python"><div class="highlight"><pre><span class="mi">26918</span>
+</pre></div>
+</div>
+<p>And what is definition of &#8220;26918&#8221;? As we saw in &#8220;<a class="reference internal" href="loading_data.html#loading-data"><em>loading data section</em></a>&#8221;, the definition is contained in the <tt class="docutils literal"><span class="pre">spatial_ref_sys</span></tt> table. In fact, <strong>two</strong> definitions are there. The &#8220;well-known text&#8221; (<a class="reference internal" href="glossary.html#term-wkt"><em class="xref std std-term">WKT</em></a>) definition is in the <tt class="docutils literal"><span class="pre">srtext</span></tt> column, and there is a second definition in &#8220;proj.4&#8221; format in the <tt class="docutils literal"><span class="pre">proj4text</span></tt> column.</p>
+<div class="highlight-sql"><div class="highlight"><pre><span class="k">SELECT</span> <span class="o">*</span> <span class="k">FROM</span> <span class="n">spatial_ref_sys</span> <span class="k">WHERE</span> <span class="n">srid</span> <span class="o">=</span> <span class="mi">26918</span><span class="p">;</span>
+</pre></div>
+</div>
+<p>In fact, for the internal PostGIS re-projection calculations, it is the contents of the <tt class="docutils literal"><span class="pre">proj4text</span></tt> column that are used. For our 26918 projection, here is the proj.4 text:</p>
+<div class="highlight-sql"><div class="highlight"><pre><span class="k">SELECT</span> <span class="n">proj4text</span> <span class="k">FROM</span> <span class="n">spatial_ref_sys</span> <span class="k">WHERE</span> <span class="n">srid</span> <span class="o">=</span> <span class="mi">26918</span><span class="p">;</span>
+</pre></div>
+</div>
+<div class="highlight-python"><div class="highlight"><pre><span class="o">+</span><span class="n">proj</span><span class="o">=</span><span class="n">utm</span> <span class="o">+</span><span class="n">zone</span><span class="o">=</span><span class="mi">18</span> <span class="o">+</span><span class="n">ellps</span><span class="o">=</span><span class="n">GRS80</span> <span class="o">+</span><span class="n">datum</span><span class="o">=</span><span class="n">NAD83</span> <span class="o">+</span><span class="n">units</span><span class="o">=</span><span class="n">m</span> <span class="o">+</span><span class="n">no_defs</span>
+</pre></div>
+</div>
+<p>In practice, both the <tt class="docutils literal"><span class="pre">srtext</span></tt> and the <tt class="docutils literal"><span class="pre">proj4text</span></tt> columns are important: the <tt class="docutils literal"><span class="pre">srtext</span></tt> column is used by external programs like <a class="reference external" href="http://geoserver.org">GeoServer</a>, <a class="reference external" href="udig.refractions.net">uDig</a>, and <a class="reference external" href="http://www.safe.com/">FME</a>  and others; the <tt class="docutils literal"><span class="pre">proj4text</span></tt> column is used internally.</p>
+<div class="section" id="comparing-data">
+<h2>Comparing Data<a class="headerlink" href="#comparing-data" title="Permalink to this headline">¶</a></h2>
+<p>Taken together, a coordinate and an SRID define a location on the globe. Without an SRID, a coordinate is just an abstract notion. A “Cartesian” coordinate plane is defined as a “flat” coordinate system placed on the surface of Earth. Because PostGIS functions work on such a plane, comparison operations require that both geometries be represented in the same SRID.</p>
+<p>If you feed in geometries with differing SRIDs you will just get an error:</p>
+<div class="highlight-sql"><div class="highlight"><pre><span class="k">SELECT</span> <span class="n">ST_Equals</span><span class="p">(</span>
+         <span class="n">ST_GeomFromText</span><span class="p">(</span><span class="s1">&#39;POINT(0 0)&#39;</span><span class="p">,</span> <span class="mi">4326</span><span class="p">),</span>
+         <span class="n">ST_GeomFromText</span><span class="p">(</span><span class="s1">&#39;POINT(0 0)&#39;</span><span class="p">,</span> <span class="mi">26918</span><span class="p">)</span>
+         <span class="p">);</span>
+</pre></div>
+</div>
+<div class="highlight-python"><pre>ERROR:  Operation on two geometries with different SRIDs
+CONTEXT:  SQL function "st_equals" statement 1</pre>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Be careful of getting too happy with using <strong class="command">ST_Transform</strong> for on-the-fly conversion. Spatial indexes are built using SRID of the stored geometries.  If comparison are done in a different SRID, spatial indexes are (often) not used. It is best practice to choose <strong>one SRID</strong> for all the tables in your database. Only use the transformation function when you are reading or writing data to external applications.</p>
+</div>
+</div>
+<div class="section" id="transforming-data">
+<h2>Transforming Data<a class="headerlink" href="#transforming-data" title="Permalink to this headline">¶</a></h2>
+<p>If we return to our proj4 definition for SRID 26918, we can see that our working projection is UTM (Universal Transverse Mercator) of zone 18, with meters as the unit of measurement.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="o">+</span><span class="n">proj</span><span class="o">=</span><span class="n">utm</span> <span class="o">+</span><span class="n">zone</span><span class="o">=</span><span class="mi">18</span> <span class="o">+</span><span class="n">ellps</span><span class="o">=</span><span class="n">GRS80</span> <span class="o">+</span><span class="n">datum</span><span class="o">=</span><span class="n">NAD83</span> <span class="o">+</span><span class="n">units</span><span class="o">=</span><span class="n">m</span> <span class="o">+</span><span class="n">no_defs</span>
+</pre></div>
+</div>
+<p>Let&#8217;s convert some data from our working projection to geographic coordinates &#8211; also known as &#8220;longitude/latitude&#8221;.</p>
+<p>To convert data from one SRID to another, you must first verify that your geometry has a valid SRID. Since we have already confirmed a valid SRID, we next need the SRID of the projection to transform into. In other words, what is the SRID of geographic coordinates?</p>
+<p>The most common SRID for geographic coordinates is 4326, which corresponds to &#8220;longitude/latitude on the WGS84 spheroid&#8221;. You can see the definition at the spatialreference.org site:</p>
+<blockquote>
+<div><a class="reference external" href="http://spatialreference.org/ref/epsg/4326/">http://spatialreference.org/ref/epsg/4326/</a></div></blockquote>
+<p>You can also pull the definitions from the <tt class="docutils literal"><span class="pre">spatial_ref_sys</span></tt> table:</p>
+<div class="highlight-sql"><div class="highlight"><pre><span class="k">SELECT</span> <span class="n">srtext</span> <span class="k">FROM</span> <span class="n">spatial_ref_sys</span> <span class="k">WHERE</span> <span class="n">srid</span> <span class="o">=</span> <span class="mi">4326</span><span class="p">;</span>
+</pre></div>
+</div>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">GEOGCS</span><span class="p">[</span><span class="s">&quot;WGS 84&quot;</span><span class="p">,</span>
+  <span class="n">DATUM</span><span class="p">[</span><span class="s">&quot;WGS_1984&quot;</span><span class="p">,</span>
+    <span class="n">SPHEROID</span><span class="p">[</span><span class="s">&quot;WGS 84&quot;</span><span class="p">,</span><span class="mi">6378137</span><span class="p">,</span><span class="mf">298.257223563</span><span class="p">,</span><span class="n">AUTHORITY</span><span class="p">[</span><span class="s">&quot;EPSG&quot;</span><span class="p">,</span><span class="s">&quot;7030&quot;</span><span class="p">]],</span>
+    <span class="n">AUTHORITY</span><span class="p">[</span><span class="s">&quot;EPSG&quot;</span><span class="p">,</span><span class="s">&quot;6326&quot;</span><span class="p">]],</span>
+  <span class="n">PRIMEM</span><span class="p">[</span><span class="s">&quot;Greenwich&quot;</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="n">AUTHORITY</span><span class="p">[</span><span class="s">&quot;EPSG&quot;</span><span class="p">,</span><span class="s">&quot;8901&quot;</span><span class="p">]],</span>
+  <span class="n">UNIT</span><span class="p">[</span><span class="s">&quot;degree&quot;</span><span class="p">,</span><span class="mf">0.01745329251994328</span><span class="p">,</span><span class="n">AUTHORITY</span><span class="p">[</span><span class="s">&quot;EPSG&quot;</span><span class="p">,</span><span class="s">&quot;9122&quot;</span><span class="p">]],</span>
+  <span class="n">AUTHORITY</span><span class="p">[</span><span class="s">&quot;EPSG&quot;</span><span class="p">,</span><span class="s">&quot;4326&quot;</span><span class="p">]]</span>
+</pre></div>
+</div>
+<p>Let&#8217;s convert the coordinates of the &#8216;Broad St&#8217; subway station into geographics:</p>
+<div class="highlight-sql"><div class="highlight"><pre><span class="k">SELECT</span> <span class="n">ST_AsText</span><span class="p">(</span><span class="n">ST_Transform</span><span class="p">(</span><span class="n">geom</span><span class="p">,</span><span class="mi">4326</span><span class="p">))</span>
+<span class="k">FROM</span> <span class="n">nyc_subway_stations</span>
+<span class="k">WHERE</span> <span class="n">name</span> <span class="o">=</span> <span class="s1">&#39;Broad St&#39;</span><span class="p">;</span>
+</pre></div>
+</div>
+<div class="highlight-python"><pre>POINT(-74.0106714688735 40.7071048155841)</pre>
+</div>
+<p>If you load data or create a new geometry without specifying an SRID, the SRID value will be 0.  Recall in <a class="reference internal" href="geometries.html#geometries"><em>Section 8: Geometries</em></a>, that when we created our <tt class="docutils literal"><span class="pre">geoemetries</span></tt> table we didn&#8217;t specify an SRID. If we query our database, we should expect all the <tt class="docutils literal"><span class="pre">nyc_</span></tt> tables to have an SRID of 26918, while  the <tt class="docutils literal"><span class="pre">geometries</span></tt> table defaulted to an SRID of 0.</p>
+<p>To view a table&#8217;s SRID assignment, query the database&#8217;s <tt class="docutils literal"><span class="pre">geometry_columns</span></tt> table.</p>
+<div class="highlight-sql"><div class="highlight"><pre><span class="k">SELECT</span> <span class="n">f_table_name</span> <span class="k">AS</span> <span class="n">name</span><span class="p">,</span> <span class="n">srid</span>
+<span class="k">FROM</span> <span class="n">geometry_columns</span><span class="p">;</span>
+</pre></div>
+</div>
+<div class="highlight-python"><pre>        name         | srid
+---------------------+-------
+ nyc_census_blocks   | 26918
+ nyc_neighborhoods   | 26918
+ nyc_streets         | 26918
+ nyc_subway_stations | 26918
+ geometries          |     0</pre>
+</div>
+<p>However, if you know what the SRID of the coordinates is supposed to be, you can set it post-facto, using <strong class="command">ST_SetSRID</strong> on the geometry. Then you will be able to transform the geometry into other systems.</p>
+<div class="highlight-sql"><div class="highlight"><pre><span class="k">SELECT</span> <span class="n">ST_AsText</span><span class="p">(</span>
+ <span class="n">ST_Transform</span><span class="p">(</span>
+   <span class="n">ST_SetSRID</span><span class="p">(</span><span class="n">geom</span><span class="p">,</span><span class="mi">26918</span><span class="p">),</span>
+ <span class="mi">4326</span><span class="p">)</span>
+<span class="p">)</span>
+<span class="k">FROM</span> <span class="n">geometries</span><span class="p">;</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="function-list">
+<h2>Function List<a class="headerlink" href="#function-list" title="Permalink to this headline">¶</a></h2>
+<p><a class="reference external" href="http://postgis.net/docs/manual-2.1/ST_AsText.html">ST_AsText</a>: Returns the Well-Known Text (WKT) representation of the geometry/geography without SRID metadata.</p>
+<p><a class="reference external" href="http://postgis.net/docs/manual-2.1/ST_SetSRID.html">ST_SetSRID(geometry, srid)</a>: Sets the SRID on a geometry to a particular integer value.</p>
+<p><a class="reference external" href="http://postgis.net/docs/manual-2.1/ST_SRID.html">ST_SRID(geometry)</a>: Returns the spatial reference identifier for the ST_Geometry as defined in spatial_ref_sys table.</p>
+<p><a class="reference external" href="http://postgis.net/docs/manual-2.1/ST_Transform.html">ST_Transform(geometry, srid)</a>: Returns a new geometry with its coordinates transformed to the SRID referenced by the integer parameter.</p>
+</div>
+</div>
+
+
+      <!-- Next/Prev -->
+      <div class="selfclear pagination-nav">
+          <div class="left"><strong>Previous</strong>: <a href="indexing.html" title="previous chapter">Section 14: Spatial Indexing</a></div>
+          <div class="right"><strong>Next</strong>: <a href="projection_exercises.html" title="next chapter">Section 16: Projection Exercises</a></div>
+      </div>
+
+  </div> <!-- rightbar_main -->
+
+  <div id="rightbar_bar">
+    
+      <div id="toc" class="section">
+        <h4 class="pngfix">Page Contents</h4>
+        <ul>
+<li><a class="reference internal" href="#">Section 15: Projecting Data</a><ul>
+<li><a class="reference internal" href="#comparing-data">Comparing Data</a></li>
+<li><a class="reference internal" href="#transforming-data">Transforming Data</a></li>
+<li><a class="reference internal" href="#function-list">Function List</a></li>
+</ul>
+</li>
+</ul>
+
+        <div class="section-footer"></div>
+      </div>
+        <div class="section">
+          <h3>Continue Reading</h3>
+          <p style="margin-top:1em"><b>Previous:</b> <a href="indexing.html" title="previous chapter">Section 14: Spatial Indexing</a></p>
+          <p><b>Next:</b> <a href="projection_exercises.html" title="next chapter">Section 16: Projection Exercises</a></p>
+          </ul>
+        </div>
+
+   <h4>About Boundless</h4>
+   <p>Boundless provides <a href="http://boundlessgeo.com/solutions/">commercial open source software</a> for internet mapping and geospatial application development. We are dedicated to the growth and support of open source software.</p>
+
+    <h4>License</h4>
+    <p>This work is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/3.0/">Creative Commons Non Commercial-Attribution-Share Alike 3.0 United States License</a>.  Feel free to use this material, but we ask that you please retain the Boundless branding, logos and style.</p>
+<p><a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/3.0/"><img alt="Creative Commons License" style="border-width:0" src="http://i.creativecommons.org/l/by-nc-sa/3.0/88x31.png" /></a></p>
+<!--
+<ul id="relatedlinks" class="selfclear">
+  <li class="first">
+    <a href="projection_exercises.html" title="Section 16: Projection Exercises"
+       accesskey="N">next</a></li>
+  <li>
+    <a href="indexing.html" title="Section 14: Spatial Indexing"
+       accesskey="P">previous</a>|</li>
+</ul> -->
+  </div> <!-- rightbar_bar -->
+
+  </div> <!-- content -->
+  <div id="footer">
+    <footer id="colophon" class="site-footer" role="contentinfo">
+		<div class="container">
+			<div class="row">
+				<div class="span2">
+					<h5>Solutions</h5>
+					<div class="footer-solutions-menu">
+						<ul id="menu-solutions" class="menu">
+							<li><a href="http://boundlessgeo.com/solutions/">Overview</a></li>
+							<li><a href="http://boundlessgeo.com/opengeo-suite/">OpenGeo Suite</a></li>
+							<li><a href="http://boundlessgeo.com/solutions/mapmeter/">MapMeter</a></li>
+							<li><a href="http://boundlessgeo.com/solutions/solutions-software/">Software</a></li>
+							<li><a href="http://boundlessgeo.com/solutions/solutions-industry/">Industries</a></li>
+						</ul>
+					</div>
+				</div>
+				<div class="span2">
+					<h5>Resources</h5>
+					<div class="footer-resources-menu">
+						<ul id="menu-resources" class="menu">
+              <li><a href="http://boundlessgeo.com/resources/">Overview</a></li>
+							<li><a href="http://boundlessgeo.com/documentation/">Documentation</a></li>
+							<li><a href="http://boundlessgeo.com/resources/trainings/">Trainings</a></li>
+							<li><a href="http://workshops.boundlessgeo.com/">Workshops</a></li>
+							<li><a href="http://boundlessgeo.com/case-studies/">Case Studies</a></li>
+							<li><a href="http://boundlessgeo.com/resources/white-papers/">White Papers</a></li>
+						</ul>
+					</div>
+				</div>
+				<div class="span2">
+					<h5>About Us</h5>
+					<div class="footer-about-menu">
+						<ul id="menu-about-menu" class="menu">
+              <li><a href="http://boundlessgeo.com/about/">Overview</a></li>
+							<li><a href="http://boundlessgeo.com/why-boundless/">Why Boundless</a></li>
+							<li><a href="http://boundlessgeo.com/about/team/">Team</a></li>
+							<li><a href="http://boundlessgeo.com/resources/careers/">Careers</a></li>
+							<li><a href="http://boundlessgeo.com/resources/partners/">Partners</a></li>
+							<li><a href="http://boundlessgeo.com/blog/">Blog</a></li>
+							<li><a href="http://boundlessgeo.com/resources/news/">News &amp; Media</a></li>
+              <li><a href="http://boundlessgeo.com/general-information/">Contact</a></li>
+            </ul></div>
+  				</div>
+
+				<div class="span6 site-info">
+
+					<div class="row-fluid">
+						<div class="span6">
+							<h5>Contact</h5>
+							<p class="address">
+								<span>155 Water Street, Suite 4-10</span>
+								<span>Brooklyn, NY 11201</span>
+								<span>1-877-673-6436</span>
+								<span>contact@boundlessgeo.com</span>
+							</p>
+						</div>
+						<div class="span6">
+							<span class="social"><i class="twitter"></i><a href="https://twitter.com/boundlessgeo" target="_blank">Follow us on Twitter</a></span>
+							<span class="social"><i class="linkedIn"></i><a href="http://www.linkedin.com/company/boundlessgeo" target="_blank">Follow us on Linkedin</a></span>
+						</div>
+					</div>
+
+				</div>
+			</div>
+			<div class="row">
+				<div class="span12 footer-sub-menu">
+					<div class="menu-footer-menu-container">
+						<ul id="menu-footer-menu" class="menu">
+							<li><a href="http://boundlessgeo.com/terms-service/">Terms of Service</a></li>
+							<li><a href="http://boundlessgeo.com/privacy-policy/">Privacy Policy</a></li>
+							<li><a href="http://boundlessgeo.com/site-map/">Site Map</a></li>
+							<li><a href="http://boundlessgeo.com/">© Boundless</a></li>
+						</ul>
+					</div>
+				</div>
+			</div>
+		</div>
+		<a class="question btn btn-primary" href="http://boundlessgeo.com/general-information/?contact-variable=ask_a_question"><i class="bubble"></i>Ask A Question</a>
+	</footer>
+  </div><!-- footer -->
+
+</div><!-- container -->
+
+<script type="text/javascript" src="http://boundlessgeo.com/wp-content/themes/open-geo/js/dropdown.js"></script>
+<script type="text/javascript">
+var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+</script>
+<script type="text/javascript">
+try {
+var pageTracker = _gat._getTracker("UA-3879903-6");
+pageTracker._trackPageview();
+} catch(err) {}
+</script>
+
+  </body>
+</html>

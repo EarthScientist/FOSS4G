@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html lang="en-US" prefix="og: http://ogp.me/ns#">
+<head>
+  <meta charset="UTF-8">
+  
+  <title>Boundless : Introduction to PostGIS : Section 19: More Spatial Joins</title>
+
+  <link rel="profile" href="http://gmpg.org/xfn/11">
+  <link rel="stylesheet" href="http://boundlessgeo.com/wp-content/themes/open-geo/style.css" type="text/css"/>
+
+<link rel="stylesheet" id="style-css" href="http://boundlessgeo.com/wp-content/themes/open-geo/style.css?ver=3.6.1" type="text/css" media="all">
+  <link rel="stylesheet" href="_static/extra.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <!-- <link rel="stylesheet" type="text/css" href="http://opengeo.org/include/superfish/css/superfish.css" media="screen" /> -->
+
+  <script type="text/javascript" src="http://boundlessgeo.com/wordpress/wp-includes/js/jquery/jquery.js?ver=1.10.2"></script>
+  <script type="text/javascript" src="http://boundlessgeo.com/wordpress/wp-includes/js/jquery/jquery-migrate.min.js?ver=1.2.1"></script>
+
+  <script type="text/javascript">
+    var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '1.0',
+        COLLAPSE_MODINDEX: false,
+        FILE_SUFFIX: '.html'
+    };
+  </script>
+  <script type="text/javascript" src="_static/jquery.js"></script>
+  <script type="text/javascript" src="_static/underscore.js"></script>
+  <script type="text/javascript" src="_static/doctools.js"></script>
+  <script type="text/javascript" src="_static/searchtools.js"></script>
+  <script type="text/javascript" src="searchindex.js"></script>
+  <!-- 
+  <script type="text/javascript" src="http://opengeo.org/include/superfish/js/jquery-1.2.6.min.js"></script> 
+  <script type="text/javascript" src="http://opengeo.org/include/superfish/js/hoverIntent.js"></script>
+  <script type="text/javascript" src="http://opengeo.org/include/superfish/js/superfish.js"></script>
+  <script type="text/javascript" src="http://opengeo.org/include/superfish/js/supersubs.js"></script>
+  <script>
+	$(document).ready(function(){
+		$("ul.sf-menu").supersubs({
+		}).superfish();  // call supersubs first, then superfish, so that subs are
+						 // not display:none when measuring. Call before initialising
+						 // containing tabs for same reason.
+	});
+	</script>
+  -->
+  <link rel="shortcut icon" href="_static/favicon.ico"/>
+      <link rel="top" title="Introduction to PostGIS" href="index.html" />
+      <link rel="next" title="Section 20: Validity" href="validity.html" />
+      <link rel="prev" title="Section 18: Geometry Constructing Functions" href="geometry_returning.html" />
+
+<script type="text/javascript" src="//use.typekit.net/ijz1lwt.js"></script>
+<script type="text/javascript">try{Typekit.load();}catch(e){}</script>
+
+<!--[if lt IE 9]>
+<script src="http://boundlessgeo.com/wp-content/themes/open-geo/js/html5.js" type="text/javascript"></script>
+<![endif]-->
+
+
+</head>
+<body class="page">
+
+	<div id="wrapper">
+		<header id="masthead" class="site-header" role="banner">
+			<div class="container">
+				<a href="http://boundlessgeo.com/" rel="home" id="logo"><img src="http://boundlessgeo.com/wp-content/themes/open-geo/images/logo.png"></a>
+
+				<div class="pull-right">
+					<div class="pull-left">
+						<div class="menu-main-container">
+							<ul id="menu-main" class="menu">
+                <li class="solutions-primary menu-item menu-item-type-post_type menu-item-object-page menu-item-22"><a href="http://boundlessgeo.com/solutions/">Solutions</a></li>
+                <li class="resources-primary menu-item menu-item-type-post_type menu-item-object-page current-menu-item page_item page-item-16 current_page_item menu-item-23"><a href="http://boundlessgeo.com/resources/">Resources</a></li>
+                <li class="about-primary menu-item menu-item-type-post_type menu-item-object-page menu-item-24"><a href="http://boundlessgeo.com/about/">About</a></li>
+                <li class="support-primary menu-item menu-item-type-post_type menu-item-object-page menu-item-25"><a href="http://boundlessgeo.com/support/">Support</a></li>
+							</ul>
+						</div>
+					</div>
+					<div class="search dropdown">
+					  <a class="dropdown-toggle" data-toggle="dropdown" href="#"><i class="search-icon"></i></a>
+						  <div class="dropdown-menu" role="menu" aria-labelledby="dLabel">
+							  <form method="get" id="searchform" class="searchform" action="http://boundlessgeo.com/" role="search">
+								  <label for="s" class="screen-reader-text">Search</label>
+							  <input type="search" class="field" name="s" value="" id="s" placeholder="Search …">
+							  <input type="submit" class="submit" id="searchsubmit" value="Search">
+							  </form>
+						  </div>
+					</div>
+					<div class="download-link">
+						<ul id="menu-download-link" class="menu">
+							<li id="menu-item-5817" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-5817">
+								<a href="http://boundlessgeo.com/download/">Download</a>
+							</li>
+						</ul>
+					</div>
+				</div>
+
+			</div><!--closes container-->
+
+		</header>
+<section class="resources page-resources">
+  <div class="secondarynav">
+     <div class="container">
+       	<div class="menu-resources-container">
+	   <ul id="menu-resources" class="menu">
+              <li id="menu-item-5892" class="menu-item menu-item-type-post_type menu-item-object-page current-menu-item page_item page-item-16 current_page_item menu-item-5892"><a href="http://boundlessgeo.com/resources/" >Overview</a></li>
+              <li id="menu-item-7099" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-7099"><a href="http://boundlessgeo.com/resources/documentation/" >Documentation</a></li>
+              <li id="menu-item-5885" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-5885"><a href="http://boundlessgeo.com/resources/trainings/" >Trainings</a></li>
+              <li id="menu-item-6432" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-6432"><a href="http://workshops.boundlessgeo.com/" >Workshops</a></li>
+              <li id="menu-item-5318" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-5318"><a href="http://boundlessgeo.com/resources/case-studies/" >Case Studies</a></li>
+              <li id="menu-item-5891" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-5891"><a href="http://boundlessgeo.com/resources/white-papers/" >White Papers</a></li>
+           </ul>
+         </div>		
+      </div>
+    </div>
+</section>
+<header class="page-header">
+	<div class="container">
+		<h1 class="page-title"><a href="index.html">Introduction to PostGIS</a></h1>
+		<p>PostGIS extends PostgreSQL with robust spatial database management capabilities. <a href="http://boundlessgeo.com/solutions/solutions-software/postgis/">More info</a></p>
+	</div>
+</header><div id="pageheading"><div class="contents"><h1>Introduction to PostGIS</h1></div></div>
+
+  <div id="content" class="contents">
+  <!--
+<div id="breadcrumbs">
+  <a href="http://boundlessgeo.com/">Home</a> &raquo;
+  <a href="http://boundlessgeo.com/resources/">Resources</a> &raquo;
+  <a href="http://workshops.boundlessgeo.com/">Workshops</a> &raquo;
+  <a href="index.html">Introduction to PostGIS</a>
+  
+     &raquo; <a href="">Section 19: More Spatial Joins</a>
+</div> -->
+
+  <div id="rightbar_main">
+      
+  <div class="section" id="section-19-more-spatial-joins">
+<span id="joins-advanced"></span><h1>Section 19: More Spatial Joins<a class="headerlink" href="#section-19-more-spatial-joins" title="Permalink to this headline">¶</a></h1>
+<p>In the last section we saw the <strong class="command">ST_Centroid(geometry)</strong> and <strong class="command">ST_Union([geometry])</strong> functions, and some simple examples. In this section we will do some more elaborate things with them.</p>
+<div class="section" id="creating-a-census-tracts-table">
+<span id="creatingtractstable"></span><h2>Creating a Census Tracts Table<a class="headerlink" href="#creating-a-census-tracts-table" title="Permalink to this headline">¶</a></h2>
+<p>In the workshop <tt class="docutils literal"><span class="pre">\data\</span></tt> directory, is a file that includes attribute data, but no geometry, <tt class="docutils literal"><span class="pre">nyc_census_sociodata.sql</span></tt>. The table includes interesting socioeconomic data about New York: commute times, incomes, and education attainment. There is just one problem. The data are summarized by &#8220;census tract&#8221; and we have no census tract spatial data!</p>
+<p>In this section we will</p>
+<ul class="simple">
+<li>Load the <tt class="docutils literal"><span class="pre">nyc_census_sociodata.sql</span></tt> table</li>
+<li>Create a spatial table for census tracts</li>
+<li>Join the attribute data to the spatial data</li>
+<li>Carry out some analysis using our new data</li>
+</ul>
+<div class="section" id="loading-nyc-census-sociodata-sql">
+<h3>Loading nyc_census_sociodata.sql<a class="headerlink" href="#loading-nyc-census-sociodata-sql" title="Permalink to this headline">¶</a></h3>
+<ol class="arabic simple">
+<li>Open the SQL query window in PgAdmin</li>
+<li>Select <strong>File-&gt;Open</strong> from the menu and browse to the <tt class="docutils literal"><span class="pre">nyc_census_sociodata.sql</span></tt> file</li>
+<li>Press the &#8220;Run Query&#8221; button</li>
+<li>If you press the &#8220;Refresh&#8221; button in PgAdmin, the list of tables should now include at <tt class="docutils literal"><span class="pre">nyc_census_sociodata</span></tt> table</li>
+</ol>
+</div>
+<div class="section" id="id1">
+<h3>Creating a Census Tracts Table<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h3>
+<p>As we saw in the previous section, we can build up higher level geometries from the census block by summarizing on substrings of the <tt class="docutils literal"><span class="pre">blkid</span></tt> key. In order to get census tracts, we need to summarize grouping on the first 11 characters of the <tt class="docutils literal"><span class="pre">blkid</span></tt>.</p>
+<div class="highlight-python"><pre>360610001001001 = 36 061 000100 1 001
+
+36     = State of New York
+061    = New York County (Manhattan)
+000100 = Census Tract
+1      = Census Block Group
+001    = Census Block</pre>
+</div>
+<p>Create the new table using the <strong class="command">ST_Union</strong> aggregate:</p>
+<div class="highlight-sql"><div class="highlight"><pre><span class="c1">-- Make the tracts table</span>
+<span class="k">CREATE</span> <span class="k">TABLE</span> <span class="n">nyc_census_tract_geoms</span> <span class="k">AS</span>
+<span class="k">SELECT</span>
+  <span class="n">ST_Union</span><span class="p">(</span><span class="n">geom</span><span class="p">)</span> <span class="k">AS</span> <span class="n">geom</span><span class="p">,</span>
+  <span class="n">SubStr</span><span class="p">(</span><span class="n">blkid</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">11</span><span class="p">)</span> <span class="k">AS</span> <span class="n">tractid</span>
+<span class="k">FROM</span> <span class="n">nyc_census_blocks</span>
+<span class="k">GROUP</span> <span class="k">BY</span> <span class="n">tractid</span><span class="p">;</span>
+
+<span class="c1">-- Index the tractid</span>
+<span class="k">CREATE</span> <span class="k">INDEX</span> <span class="n">nyc_census_tract_geoms_tractid_idx</span>
+  <span class="k">ON</span> <span class="n">nyc_census_tract_geoms</span> <span class="p">(</span><span class="n">tractid</span><span class="p">);</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="join-the-attributes-to-the-spatial-data">
+<h3>Join the Attributes to the Spatial Data<a class="headerlink" href="#join-the-attributes-to-the-spatial-data" title="Permalink to this headline">¶</a></h3>
+<p>Join the table of tract geometries to the table of tract attributes with a standard attribute join</p>
+<div class="highlight-sql"><div class="highlight"><pre><span class="c1">-- Make the tracts table</span>
+<span class="k">CREATE</span> <span class="k">TABLE</span> <span class="n">nyc_census_tracts</span> <span class="k">AS</span>
+<span class="k">SELECT</span>
+  <span class="k">g</span><span class="p">.</span><span class="n">geom</span><span class="p">,</span>
+  <span class="n">a</span><span class="p">.</span><span class="o">*</span>
+<span class="k">FROM</span> <span class="n">nyc_census_tract_geoms</span> <span class="k">g</span>
+<span class="k">JOIN</span> <span class="n">nyc_census_sociodata</span> <span class="n">a</span>
+<span class="k">ON</span> <span class="k">g</span><span class="p">.</span><span class="n">tractid</span> <span class="o">=</span> <span class="n">a</span><span class="p">.</span><span class="n">tractid</span><span class="p">;</span>
+
+<span class="c1">-- Index the geometries</span>
+<span class="k">CREATE</span> <span class="k">INDEX</span> <span class="n">nyc_census_tract_gidx</span>
+  <span class="k">ON</span> <span class="n">nyc_census_tracts</span> <span class="k">USING</span> <span class="n">GIST</span> <span class="p">(</span><span class="n">geom</span><span class="p">);</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="answer-an-interesting-question">
+<span id="interestingquestion"></span><h3>Answer an Interesting Question<a class="headerlink" href="#answer-an-interesting-question" title="Permalink to this headline">¶</a></h3>
+<p>Answer an interesting question! &#8220;List top 10 New York neighborhoods ordered by the proportion of people who have graduate degrees.&#8221;</p>
+<div class="highlight-sql"><div class="highlight"><pre><span class="k">SELECT</span>
+  <span class="n">Round</span><span class="p">(</span><span class="mi">100</span><span class="p">.</span><span class="mi">0</span> <span class="o">*</span> <span class="k">Sum</span><span class="p">(</span><span class="n">t</span><span class="p">.</span><span class="n">edu_graduate_dipl</span><span class="p">)</span> <span class="o">/</span> <span class="k">Sum</span><span class="p">(</span><span class="n">t</span><span class="p">.</span><span class="n">edu_total</span><span class="p">),</span> <span class="mi">1</span><span class="p">)</span> <span class="k">AS</span> <span class="n">graduate_pct</span><span class="p">,</span>
+  <span class="n">n</span><span class="p">.</span><span class="n">name</span><span class="p">,</span> <span class="n">n</span><span class="p">.</span><span class="n">boroname</span>
+<span class="k">FROM</span> <span class="n">nyc_neighborhoods</span> <span class="n">n</span>
+<span class="k">JOIN</span> <span class="n">nyc_census_tracts</span> <span class="n">t</span>
+<span class="k">ON</span> <span class="n">ST_Intersects</span><span class="p">(</span><span class="n">n</span><span class="p">.</span><span class="n">geom</span><span class="p">,</span> <span class="n">t</span><span class="p">.</span><span class="n">geom</span><span class="p">)</span>
+<span class="k">WHERE</span> <span class="n">t</span><span class="p">.</span><span class="n">edu_total</span> <span class="o">&gt;</span> <span class="mi">0</span>
+<span class="k">GROUP</span> <span class="k">BY</span> <span class="n">n</span><span class="p">.</span><span class="n">name</span><span class="p">,</span> <span class="n">n</span><span class="p">.</span><span class="n">boroname</span>
+<span class="k">ORDER</span> <span class="k">BY</span> <span class="n">graduate_pct</span> <span class="k">DESC</span>
+<span class="k">LIMIT</span> <span class="mi">10</span><span class="p">;</span>
+</pre></div>
+</div>
+<p>We sum up the statistics we are interested, then divide them together at the end. In order to avoid divide-by-zero errors, we don&#8217;t bother bringing in tracts that have a population count of zero.</p>
+<div class="highlight-python"><pre> graduate_pct |       name        | boroname
+--------------+-------------------+-----------
+         47.6 | Carnegie Hill     | Manhattan
+         42.2 | Upper West Side   | Manhattan
+         41.1 | Battery Park      | Manhattan
+         39.6 | Flatbush          | Brooklyn
+         39.3 | Tribeca           | Manhattan
+         39.2 | North Sutton Area | Manhattan
+         38.7 | Greenwich Village | Manhattan
+         38.6 | Upper East Side   | Manhattan
+         37.9 | Murray Hill       | Manhattan
+         37.4 | Central Park      | Manhattan</pre>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">New York geographers will be wondering at the presence of &#8220;Flatbush&#8221; in this list of over-educated neighborhoods. The answer is discussed in the next section.</p>
+</div>
+</div>
+</div>
+<div class="section" id="polygon-polygon-joins">
+<span id="polypolyjoins"></span><h2>Polygon/Polygon Joins<a class="headerlink" href="#polygon-polygon-joins" title="Permalink to this headline">¶</a></h2>
+<p>In our interesting query (in <a class="reference internal" href="#interestingquestion"><em>Answer an Interesting Question</em></a>) we used the <strong class="command">ST_Intersects(geometry_a, geometry_b)</strong> function to determine which census tract polygons to include in each neighborhood summary. Which leads to the question: what if a tract falls on the border between two neighborhoods? It will intersect both, and so will be included in the summary statistics for <strong>both</strong>.</p>
+<img alt="_images/centroid_neighborhood.png" src="_images/centroid_neighborhood.png" />
+<p>To avoid this kind of double counting there are two methods:</p>
+<ul class="simple">
+<li>The simple method is to ensure that each tract only falls in <strong>one</strong> summary area (using <strong class="command">ST_Centroid(geometry)</strong>)</li>
+<li>The complex method is to divide crossing tracts at the borders (using <strong class="command">ST_Intersection(geometry,geometry)</strong>)</li>
+</ul>
+<p>Here is an example of using the simple method to avoid double counting in our graduate education query:</p>
+<div class="highlight-sql"><div class="highlight"><pre><span class="k">SELECT</span>
+  <span class="n">Round</span><span class="p">(</span><span class="mi">100</span><span class="p">.</span><span class="mi">0</span> <span class="o">*</span> <span class="k">Sum</span><span class="p">(</span><span class="n">t</span><span class="p">.</span><span class="n">edu_graduate_dipl</span><span class="p">)</span> <span class="o">/</span> <span class="k">Sum</span><span class="p">(</span><span class="n">t</span><span class="p">.</span><span class="n">edu_total</span><span class="p">),</span> <span class="mi">1</span><span class="p">)</span> <span class="k">AS</span> <span class="n">graduate_pct</span><span class="p">,</span>
+  <span class="n">n</span><span class="p">.</span><span class="n">name</span><span class="p">,</span> <span class="n">n</span><span class="p">.</span><span class="n">boroname</span>
+<span class="k">FROM</span> <span class="n">nyc_neighborhoods</span> <span class="n">n</span>
+<span class="k">JOIN</span> <span class="n">nyc_census_tracts</span> <span class="n">t</span>
+<span class="k">ON</span> <span class="n">ST_Contains</span><span class="p">(</span><span class="n">n</span><span class="p">.</span><span class="n">geom</span><span class="p">,</span> <span class="n">ST_Centroid</span><span class="p">(</span><span class="n">t</span><span class="p">.</span><span class="n">geom</span><span class="p">))</span>
+<span class="k">WHERE</span> <span class="n">t</span><span class="p">.</span><span class="n">edu_total</span> <span class="o">&gt;</span> <span class="mi">0</span>
+<span class="k">GROUP</span> <span class="k">BY</span> <span class="n">n</span><span class="p">.</span><span class="n">name</span><span class="p">,</span> <span class="n">n</span><span class="p">.</span><span class="n">boroname</span>
+<span class="k">ORDER</span> <span class="k">BY</span> <span class="n">graduate_pct</span> <span class="k">DESC</span>
+<span class="k">LIMIT</span> <span class="mi">10</span><span class="p">;</span>
+</pre></div>
+</div>
+<p>Note that the query takes longer to run now, because the <strong class="command">ST_Centroid</strong> function  has to be run on every census tract.</p>
+<div class="highlight-python"><pre> graduate_pct |        name         | boroname
+--------------+---------------------+-----------
+         48.0 | Carnegie Hill       | Manhattan
+         44.2 | Morningside Heights | Manhattan
+         42.1 | Greenwich Village   | Manhattan
+         42.0 | Upper West Side     | Manhattan
+         41.4 | Tribeca             | Manhattan
+         40.7 | Battery Park        | Manhattan
+         39.5 | Upper East Side     | Manhattan
+         39.3 | North Sutton Area   | Manhattan
+         37.4 | Cobble Hill         | Brooklyn
+         37.4 | Murray Hill         | Manhattan</pre>
+</div>
+<p>Avoiding double counting changes the results!</p>
+<div class="section" id="what-about-flatbush">
+<h3>What about Flatbush?<a class="headerlink" href="#what-about-flatbush" title="Permalink to this headline">¶</a></h3>
+<p>In particular, the Flatbush neighborhood has dropped off the list. The reason why can be seen by looking more closely at the map of the Flatbush neighborhood in our table.</p>
+<img alt="_images/nyc_tracts_flatbush.jpg" src="_images/nyc_tracts_flatbush.jpg" />
+<p>As defined by our data source, Flatbush is not really a neighborhood in the conventional sense, since it just covers the area of Prospect Park. The census tract for that area records, naturally, zero residents. However, the neighborhood boundary does scrape one of the expensive census tracts bordering the north side of the park (in the gentrified Park Slope neighborhood). When using polygon/polygon tests, this single tract was added to the otherwise empty Flatbush, resulting in the very high score for that query.</p>
+</div>
+</div>
+<div class="section" id="large-radius-distance-joins">
+<span id="largeradiusjoins"></span><h2>Large Radius Distance Joins<a class="headerlink" href="#large-radius-distance-joins" title="Permalink to this headline">¶</a></h2>
+<p>A query that is fun to ask is &#8220;How do the commute times of people near (within 500 meters) subway stations differ from those of people far away from subway stations?&#8221;</p>
+<p>However, the question runs into some problems of double counting: many people will be within 500 meters of multiple subway stations. Compare the population of New York:</p>
+<div class="highlight-sql"><div class="highlight"><pre><span class="k">SELECT</span> <span class="k">Sum</span><span class="p">(</span><span class="n">popn_total</span><span class="p">)</span>
+<span class="k">FROM</span> <span class="n">nyc_census_blocks</span><span class="p">;</span>
+</pre></div>
+</div>
+<div class="highlight-python"><div class="highlight"><pre><span class="mi">8175032</span>
+</pre></div>
+</div>
+<p>With the population of the people in New York within 500 meters of a subway station:</p>
+<div class="highlight-sql"><div class="highlight"><pre><span class="k">SELECT</span> <span class="k">Sum</span><span class="p">(</span><span class="n">popn_total</span><span class="p">)</span>
+<span class="k">FROM</span> <span class="n">nyc_census_blocks</span> <span class="n">census</span>
+<span class="k">JOIN</span> <span class="n">nyc_subway_stations</span> <span class="n">subway</span>
+<span class="k">ON</span> <span class="n">ST_DWithin</span><span class="p">(</span><span class="n">census</span><span class="p">.</span><span class="n">geom</span><span class="p">,</span> <span class="n">subway</span><span class="p">.</span><span class="n">geom</span><span class="p">,</span> <span class="mi">500</span><span class="p">);</span>
+</pre></div>
+</div>
+<div class="highlight-python"><div class="highlight"><pre><span class="mi">10855873</span>
+</pre></div>
+</div>
+<p>There&#8217;s more people close to the subway than there are people! Clearly, our simple SQL is making a big double-counting error. You can see the problem looking at the picture of the buffered subways.</p>
+<img alt="_images/subways_buffered.png" src="_images/subways_buffered.png" />
+<p>The solution is to ensure that we have only distinct census blocks before passing them into the summarization portion of the query. We can do that by breaking our query up into a subquery that finds the distinct blocks, wrapped in a summarization query that returns our answer:</p>
+<div class="highlight-sql"><div class="highlight"><pre><span class="k">WITH</span> <span class="n">distinct_blocks</span> <span class="k">AS</span> <span class="p">(</span>
+  <span class="k">SELECT</span> <span class="k">DISTINCT</span> <span class="k">ON</span> <span class="p">(</span><span class="n">blkid</span><span class="p">)</span> <span class="n">popn_total</span>
+  <span class="k">FROM</span> <span class="n">nyc_census_blocks</span> <span class="n">census</span>
+  <span class="k">JOIN</span> <span class="n">nyc_subway_stations</span> <span class="n">subway</span>
+  <span class="k">ON</span> <span class="n">ST_DWithin</span><span class="p">(</span><span class="n">census</span><span class="p">.</span><span class="n">geom</span><span class="p">,</span> <span class="n">subway</span><span class="p">.</span><span class="n">geom</span><span class="p">,</span> <span class="mi">500</span><span class="p">)</span>
+<span class="p">)</span>
+<span class="k">SELECT</span> <span class="k">Sum</span><span class="p">(</span><span class="n">popn_total</span><span class="p">)</span>
+<span class="k">FROM</span> <span class="n">distinct_blocks</span><span class="p">;</span>
+</pre></div>
+</div>
+<div class="highlight-python"><div class="highlight"><pre><span class="mi">5005743</span>
+</pre></div>
+</div>
+<p>That&#8217;s better! So a bit over half the population of New York is within 500m (about a 5-7 minute walk) of the subway.</p>
+</div>
+</div>
+
+
+      <!-- Next/Prev -->
+      <div class="selfclear pagination-nav">
+          <div class="left"><strong>Previous</strong>: <a href="geometry_returning.html" title="previous chapter">Section 18: Geometry Constructing Functions</a></div>
+          <div class="right"><strong>Next</strong>: <a href="validity.html" title="next chapter">Section 20: Validity</a></div>
+      </div>
+
+  </div> <!-- rightbar_main -->
+
+  <div id="rightbar_bar">
+    
+      <div id="toc" class="section">
+        <h4 class="pngfix">Page Contents</h4>
+        <ul>
+<li><a class="reference internal" href="#">Section 19: More Spatial Joins</a><ul>
+<li><a class="reference internal" href="#creating-a-census-tracts-table">Creating a Census Tracts Table</a><ul>
+<li><a class="reference internal" href="#loading-nyc-census-sociodata-sql">Loading nyc_census_sociodata.sql</a></li>
+<li><a class="reference internal" href="#id1">Creating a Census Tracts Table</a></li>
+<li><a class="reference internal" href="#join-the-attributes-to-the-spatial-data">Join the Attributes to the Spatial Data</a></li>
+<li><a class="reference internal" href="#answer-an-interesting-question">Answer an Interesting Question</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#polygon-polygon-joins">Polygon/Polygon Joins</a><ul>
+<li><a class="reference internal" href="#what-about-flatbush">What about Flatbush?</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#large-radius-distance-joins">Large Radius Distance Joins</a></li>
+</ul>
+</li>
+</ul>
+
+        <div class="section-footer"></div>
+      </div>
+        <div class="section">
+          <h3>Continue Reading</h3>
+          <p style="margin-top:1em"><b>Previous:</b> <a href="geometry_returning.html" title="previous chapter">Section 18: Geometry Constructing Functions</a></p>
+          <p><b>Next:</b> <a href="validity.html" title="next chapter">Section 20: Validity</a></p>
+          </ul>
+        </div>
+
+   <h4>About Boundless</h4>
+   <p>Boundless provides <a href="http://boundlessgeo.com/solutions/">commercial open source software</a> for internet mapping and geospatial application development. We are dedicated to the growth and support of open source software.</p>
+
+    <h4>License</h4>
+    <p>This work is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/3.0/">Creative Commons Non Commercial-Attribution-Share Alike 3.0 United States License</a>.  Feel free to use this material, but we ask that you please retain the Boundless branding, logos and style.</p>
+<p><a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/3.0/"><img alt="Creative Commons License" style="border-width:0" src="http://i.creativecommons.org/l/by-nc-sa/3.0/88x31.png" /></a></p>
+<!--
+<ul id="relatedlinks" class="selfclear">
+  <li class="first">
+    <a href="validity.html" title="Section 20: Validity"
+       accesskey="N">next</a></li>
+  <li>
+    <a href="geometry_returning.html" title="Section 18: Geometry Constructing Functions"
+       accesskey="P">previous</a>|</li>
+</ul> -->
+  </div> <!-- rightbar_bar -->
+
+  </div> <!-- content -->
+  <div id="footer">
+    <footer id="colophon" class="site-footer" role="contentinfo">
+		<div class="container">
+			<div class="row">
+				<div class="span2">
+					<h5>Solutions</h5>
+					<div class="footer-solutions-menu">
+						<ul id="menu-solutions" class="menu">
+							<li><a href="http://boundlessgeo.com/solutions/">Overview</a></li>
+							<li><a href="http://boundlessgeo.com/opengeo-suite/">OpenGeo Suite</a></li>
+							<li><a href="http://boundlessgeo.com/solutions/mapmeter/">MapMeter</a></li>
+							<li><a href="http://boundlessgeo.com/solutions/solutions-software/">Software</a></li>
+							<li><a href="http://boundlessgeo.com/solutions/solutions-industry/">Industries</a></li>
+						</ul>
+					</div>
+				</div>
+				<div class="span2">
+					<h5>Resources</h5>
+					<div class="footer-resources-menu">
+						<ul id="menu-resources" class="menu">
+              <li><a href="http://boundlessgeo.com/resources/">Overview</a></li>
+							<li><a href="http://boundlessgeo.com/documentation/">Documentation</a></li>
+							<li><a href="http://boundlessgeo.com/resources/trainings/">Trainings</a></li>
+							<li><a href="http://workshops.boundlessgeo.com/">Workshops</a></li>
+							<li><a href="http://boundlessgeo.com/case-studies/">Case Studies</a></li>
+							<li><a href="http://boundlessgeo.com/resources/white-papers/">White Papers</a></li>
+						</ul>
+					</div>
+				</div>
+				<div class="span2">
+					<h5>About Us</h5>
+					<div class="footer-about-menu">
+						<ul id="menu-about-menu" class="menu">
+              <li><a href="http://boundlessgeo.com/about/">Overview</a></li>
+							<li><a href="http://boundlessgeo.com/why-boundless/">Why Boundless</a></li>
+							<li><a href="http://boundlessgeo.com/about/team/">Team</a></li>
+							<li><a href="http://boundlessgeo.com/resources/careers/">Careers</a></li>
+							<li><a href="http://boundlessgeo.com/resources/partners/">Partners</a></li>
+							<li><a href="http://boundlessgeo.com/blog/">Blog</a></li>
+							<li><a href="http://boundlessgeo.com/resources/news/">News &amp; Media</a></li>
+              <li><a href="http://boundlessgeo.com/general-information/">Contact</a></li>
+            </ul></div>
+  				</div>
+
+				<div class="span6 site-info">
+
+					<div class="row-fluid">
+						<div class="span6">
+							<h5>Contact</h5>
+							<p class="address">
+								<span>155 Water Street, Suite 4-10</span>
+								<span>Brooklyn, NY 11201</span>
+								<span>1-877-673-6436</span>
+								<span>contact@boundlessgeo.com</span>
+							</p>
+						</div>
+						<div class="span6">
+							<span class="social"><i class="twitter"></i><a href="https://twitter.com/boundlessgeo" target="_blank">Follow us on Twitter</a></span>
+							<span class="social"><i class="linkedIn"></i><a href="http://www.linkedin.com/company/boundlessgeo" target="_blank">Follow us on Linkedin</a></span>
+						</div>
+					</div>
+
+				</div>
+			</div>
+			<div class="row">
+				<div class="span12 footer-sub-menu">
+					<div class="menu-footer-menu-container">
+						<ul id="menu-footer-menu" class="menu">
+							<li><a href="http://boundlessgeo.com/terms-service/">Terms of Service</a></li>
+							<li><a href="http://boundlessgeo.com/privacy-policy/">Privacy Policy</a></li>
+							<li><a href="http://boundlessgeo.com/site-map/">Site Map</a></li>
+							<li><a href="http://boundlessgeo.com/">© Boundless</a></li>
+						</ul>
+					</div>
+				</div>
+			</div>
+		</div>
+		<a class="question btn btn-primary" href="http://boundlessgeo.com/general-information/?contact-variable=ask_a_question"><i class="bubble"></i>Ask A Question</a>
+	</footer>
+  </div><!-- footer -->
+
+</div><!-- container -->
+
+<script type="text/javascript" src="http://boundlessgeo.com/wp-content/themes/open-geo/js/dropdown.js"></script>
+<script type="text/javascript">
+var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+</script>
+<script type="text/javascript">
+try {
+var pageTracker = _gat._getTracker("UA-3879903-6");
+pageTracker._trackPageview();
+} catch(err) {}
+</script>
+
+  </body>
+</html>

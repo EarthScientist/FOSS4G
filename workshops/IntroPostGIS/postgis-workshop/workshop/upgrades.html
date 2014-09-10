@@ -1,0 +1,517 @@
+<!DOCTYPE html>
+<html lang="en-US" prefix="og: http://ogp.me/ns#">
+<head>
+  <meta charset="UTF-8">
+  
+  <title>Boundless : Introduction to PostGIS : Section 33: Software Upgrades</title>
+
+  <link rel="profile" href="http://gmpg.org/xfn/11">
+  <link rel="stylesheet" href="http://boundlessgeo.com/wp-content/themes/open-geo/style.css" type="text/css"/>
+
+<link rel="stylesheet" id="style-css" href="http://boundlessgeo.com/wp-content/themes/open-geo/style.css?ver=3.6.1" type="text/css" media="all">
+  <link rel="stylesheet" href="_static/extra.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <!-- <link rel="stylesheet" type="text/css" href="http://opengeo.org/include/superfish/css/superfish.css" media="screen" /> -->
+
+  <script type="text/javascript" src="http://boundlessgeo.com/wordpress/wp-includes/js/jquery/jquery.js?ver=1.10.2"></script>
+  <script type="text/javascript" src="http://boundlessgeo.com/wordpress/wp-includes/js/jquery/jquery-migrate.min.js?ver=1.2.1"></script>
+
+  <script type="text/javascript">
+    var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '1.0',
+        COLLAPSE_MODINDEX: false,
+        FILE_SUFFIX: '.html'
+    };
+  </script>
+  <script type="text/javascript" src="_static/jquery.js"></script>
+  <script type="text/javascript" src="_static/underscore.js"></script>
+  <script type="text/javascript" src="_static/doctools.js"></script>
+  <script type="text/javascript" src="_static/searchtools.js"></script>
+  <script type="text/javascript" src="searchindex.js"></script>
+  <!-- 
+  <script type="text/javascript" src="http://opengeo.org/include/superfish/js/jquery-1.2.6.min.js"></script> 
+  <script type="text/javascript" src="http://opengeo.org/include/superfish/js/hoverIntent.js"></script>
+  <script type="text/javascript" src="http://opengeo.org/include/superfish/js/superfish.js"></script>
+  <script type="text/javascript" src="http://opengeo.org/include/superfish/js/supersubs.js"></script>
+  <script>
+	$(document).ready(function(){
+		$("ul.sf-menu").supersubs({
+		}).superfish();  // call supersubs first, then superfish, so that subs are
+						 // not display:none when measuring. Call before initialising
+						 // containing tabs for same reason.
+	});
+	</script>
+  -->
+  <link rel="shortcut icon" href="_static/favicon.ico"/>
+      <link rel="top" title="Introduction to PostGIS" href="index.html" />
+      <link rel="next" title="Appendix A: PostGIS Functions" href="postgis-functions.html" />
+      <link rel="prev" title="Section 32: PostgreSQL Backup and Restore" href="backup.html" />
+
+<script type="text/javascript" src="//use.typekit.net/ijz1lwt.js"></script>
+<script type="text/javascript">try{Typekit.load();}catch(e){}</script>
+
+<!--[if lt IE 9]>
+<script src="http://boundlessgeo.com/wp-content/themes/open-geo/js/html5.js" type="text/javascript"></script>
+<![endif]-->
+
+
+</head>
+<body class="page">
+
+	<div id="wrapper">
+		<header id="masthead" class="site-header" role="banner">
+			<div class="container">
+				<a href="http://boundlessgeo.com/" rel="home" id="logo"><img src="http://boundlessgeo.com/wp-content/themes/open-geo/images/logo.png"></a>
+
+				<div class="pull-right">
+					<div class="pull-left">
+						<div class="menu-main-container">
+							<ul id="menu-main" class="menu">
+                <li class="solutions-primary menu-item menu-item-type-post_type menu-item-object-page menu-item-22"><a href="http://boundlessgeo.com/solutions/">Solutions</a></li>
+                <li class="resources-primary menu-item menu-item-type-post_type menu-item-object-page current-menu-item page_item page-item-16 current_page_item menu-item-23"><a href="http://boundlessgeo.com/resources/">Resources</a></li>
+                <li class="about-primary menu-item menu-item-type-post_type menu-item-object-page menu-item-24"><a href="http://boundlessgeo.com/about/">About</a></li>
+                <li class="support-primary menu-item menu-item-type-post_type menu-item-object-page menu-item-25"><a href="http://boundlessgeo.com/support/">Support</a></li>
+							</ul>
+						</div>
+					</div>
+					<div class="search dropdown">
+					  <a class="dropdown-toggle" data-toggle="dropdown" href="#"><i class="search-icon"></i></a>
+						  <div class="dropdown-menu" role="menu" aria-labelledby="dLabel">
+							  <form method="get" id="searchform" class="searchform" action="http://boundlessgeo.com/" role="search">
+								  <label for="s" class="screen-reader-text">Search</label>
+							  <input type="search" class="field" name="s" value="" id="s" placeholder="Search …">
+							  <input type="submit" class="submit" id="searchsubmit" value="Search">
+							  </form>
+						  </div>
+					</div>
+					<div class="download-link">
+						<ul id="menu-download-link" class="menu">
+							<li id="menu-item-5817" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-5817">
+								<a href="http://boundlessgeo.com/download/">Download</a>
+							</li>
+						</ul>
+					</div>
+				</div>
+
+			</div><!--closes container-->
+
+		</header>
+<section class="resources page-resources">
+  <div class="secondarynav">
+     <div class="container">
+       	<div class="menu-resources-container">
+	   <ul id="menu-resources" class="menu">
+              <li id="menu-item-5892" class="menu-item menu-item-type-post_type menu-item-object-page current-menu-item page_item page-item-16 current_page_item menu-item-5892"><a href="http://boundlessgeo.com/resources/" >Overview</a></li>
+              <li id="menu-item-7099" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-7099"><a href="http://boundlessgeo.com/resources/documentation/" >Documentation</a></li>
+              <li id="menu-item-5885" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-5885"><a href="http://boundlessgeo.com/resources/trainings/" >Trainings</a></li>
+              <li id="menu-item-6432" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-6432"><a href="http://workshops.boundlessgeo.com/" >Workshops</a></li>
+              <li id="menu-item-5318" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-5318"><a href="http://boundlessgeo.com/resources/case-studies/" >Case Studies</a></li>
+              <li id="menu-item-5891" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-5891"><a href="http://boundlessgeo.com/resources/white-papers/" >White Papers</a></li>
+           </ul>
+         </div>		
+      </div>
+    </div>
+</section>
+<header class="page-header">
+	<div class="container">
+		<h1 class="page-title"><a href="index.html">Introduction to PostGIS</a></h1>
+		<p>PostGIS extends PostgreSQL with robust spatial database management capabilities. <a href="http://boundlessgeo.com/solutions/solutions-software/postgis/">More info</a></p>
+	</div>
+</header><div id="pageheading"><div class="contents"><h1>Introduction to PostGIS</h1></div></div>
+
+  <div id="content" class="contents">
+  <!--
+<div id="breadcrumbs">
+  <a href="http://boundlessgeo.com/">Home</a> &raquo;
+  <a href="http://boundlessgeo.com/resources/">Resources</a> &raquo;
+  <a href="http://workshops.boundlessgeo.com/">Workshops</a> &raquo;
+  <a href="index.html">Introduction to PostGIS</a>
+  
+     &raquo; <a href="">Section 33: Software Upgrades</a>
+</div> -->
+
+  <div id="rightbar_main">
+      
+  <div class="section" id="section-33-software-upgrades">
+<span id="upgrades"></span><h1>Section 33: Software Upgrades<a class="headerlink" href="#section-33-software-upgrades" title="Permalink to this headline">¶</a></h1>
+<p>Because PostGIS resides within PostgreSQL every PostGIS installation actually consists of two versions of software: the PostgreSQL version and the PostGIS version.  The OpenGeo Suite only ships one combination at a time, so the number of potential combinations is reduced, but as a general principle, each version of PostGIS can be theoretically run within a number of versions of PostgreSQL, and vice versa.</p>
+<p>So, upgrades need to be considered in terms of upgrading each component.</p>
+<div class="section" id="upgrading-postgresql">
+<h2>Upgrading PostgreSQL<a class="headerlink" href="#upgrading-postgresql" title="Permalink to this headline">¶</a></h2>
+<p>There are two kinds of PostgreSQL upgrade scenarios:</p>
+<ul class="simple">
+<li>A &#8220;minor upgrade&#8221; when the software version increases at the &#8220;patch&#8221; level. For example, from 8.4.3 to 8.4.4, or from 9.0.1 to 9.0.3. Increases of more than one patch version are just fine. Minor upgrades fix bugs but do not add any new features or change behaviour.</li>
+<li>A &#8220;major upgrade&#8221; when the &#8220;major&#8221; or &#8220;minor&#8221; versions increase. For example, from 8.4.5 to 9.0.0, or from 9.0.5 to 9.1.1. Major upgrades add new features and change behavior.</li>
+</ul>
+<div class="section" id="minor-postgresql-upgrades">
+<h3>Minor PostgreSQL Upgrades<a class="headerlink" href="#minor-postgresql-upgrades" title="Permalink to this headline">¶</a></h3>
+<p>For &#8220;minor upgrades&#8221;, no special process is necessary. Simply install the new software, and re-start the server.</p>
+</div>
+<div class="section" id="major-postgresql-upgrades">
+<h3>Major PostgreSQL Upgrades<a class="headerlink" href="#major-postgresql-upgrades" title="Permalink to this headline">¶</a></h3>
+<p>For &#8220;major upgrades&#8221; there are two ways to carry out the upgrade.</p>
+<div class="section" id="dump-restore">
+<h4>Dump/Restore<a class="headerlink" href="#dump-restore" title="Permalink to this headline">¶</a></h4>
+<p>Dumping and restoring involves converting all the data to a platform neutral format (text representations) on dump, and back to native representations on restore, so it can be time consuming and CPU intensive. However, if you are migrating to a new architecture or operating system, it&#8217;s a required process. It&#8217;s also a time-tested and well-understood upgrade path, so if your database is not too big, there&#8217;s no reason not to stick with it.</p>
+<ul class="simple">
+<li>Dump your data <tt class="docutils literal"><span class="pre">pg_dumpall</span></tt> from the old database.</li>
+<li>Install the new version of PostgreSQL and the same version of PostGIS you are using in your old database. You need to match the PostGIS version so that the dump file function definitions reference an expected version of the PostGIS library.</li>
+<li>Initialize the new data area using the <tt class="docutils literal"><span class="pre">initdb</span></tt> program from the new software.</li>
+<li>Start the new server on the new data area.</li>
+<li>Restore the dump file using <tt class="docutils literal"><span class="pre">pg_restore</span></tt>.</li>
+</ul>
+</div>
+<div class="section" id="pg-upgrade">
+<h4>pg_upgrade<a class="headerlink" href="#pg-upgrade" title="Permalink to this headline">¶</a></h4>
+<p>The <a class="reference external" href="http://www.postgresql.org/docs/current/static/pgupgrade.html">pg_upgrade</a> utility allows PostgreSQL data directories to be upgraded without the requirement for a dump/restore step. The utility cannot handle changes to the data files themselves, but handles the more common and frequent changes to system tables that occur in PostgreSQL major upgrades.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">The full instructions for running the upgrade process are in the <a class="reference external" href="http://www.postgresql.org/docs/current/static/pgupgrade.html">pg_upgrade</a> web page at the PostgreSQL site.</p>
+</div>
+<p>The <a class="reference external" href="http://www.postgresql.org/docs/current/static/pgupgrade.html">pg_upgrade</a> program expects to have access to both versions of PostgreSQL it is working with, the old and the new version, so you will have to install them both.</p>
+<ul>
+<li><p class="first">Install the new version of PostgreSQL you will be using.</p>
+</li>
+<li><p class="first">Install the same version of PostGIS you are using in the old PostgreSQL into the new PostgreSQL.</p>
+</li>
+<li><p class="first">Initialize the new PostgreSQL data area with the new copy of <tt class="docutils literal"><span class="pre">initdb</span></tt>.</p>
+</li>
+<li><p class="first">Ensure both the old and new PostgreSQL servers are turned off.</p>
+</li>
+<li><p class="first">Run <a class="reference external" href="http://www.postgresql.org/docs/current/static/pgupgrade.html">pg_upgrade</a>, making sure to use the binary from the new software installation.</p>
+<div class="highlight-python"><pre>pg_upgrade
+  --old-datadir "C:/Program Files/PostgreSQL/8.4/data"
+  --new-datadir "C:/Program Files/PostgreSQL/9.0/data"
+  --old-bindir "C:/Program Files/PostgreSQL/8.4/bin"
+  --new-bindir "C:/Program Files/PostgreSQL/9.0/bin"</pre>
+</div>
+</li>
+<li><p class="first">If <a class="reference external" href="http://www.postgresql.org/docs/current/static/pgupgrade.html">pg_upgrade</a> generated any <tt class="docutils literal"><span class="pre">.sql</span></tt> files, run them now.</p>
+</li>
+<li><p class="first">Start the new server.</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="section" id="upgrading-postgis">
+<h2>Upgrading PostGIS<a class="headerlink" href="#upgrading-postgis" title="Permalink to this headline">¶</a></h2>
+<p>There are two upgrade scenarios for PostGIS too, but they are slightly different from the PostgreSQL scheme:</p>
+<p>There are two kinds of PostGIS upgrade scenarios:</p>
+<ul class="simple">
+<li>A &#8220;minor upgrade&#8221; when the software version increases at the &#8220;patch&#8221; or &#8220;minor&#8221; level. For example, from 1.5.3 to 1.5.3, or from 1.4.4 to 1.5.0. Patch upgrades fix bugs only and do not add new features. Minor upgrades fix add new features or change behaviour.</li>
+<li>A &#8220;major upgrade&#8221; when the &#8220;major&#8221; version increases. This is extremely rare. For example, from 0.9.4 to 1.0.0, or from 1.5.4 to 2.0.0. Major upgrades change the on-disk storage format for geometries and require a full database dump and restore.</li>
+</ul>
+<div class="section" id="minor-postgis-upgrades">
+<h3>Minor PostGIS Upgrades<a class="headerlink" href="#minor-postgis-upgrades" title="Permalink to this headline">¶</a></h3>
+<p>PostGIS deals with minor upgrades be redefining all the PostGIS function bindings to point to the latest version of the software. Fortunately this can be done without touching the data tables itself, just by updates to the PostgreSQL system tables.</p>
+<div class="section" id="minor-upgrades">
+<h4>Minor Upgrades<a class="headerlink" href="#minor-upgrades" title="Permalink to this headline">¶</a></h4>
+<p>For upgrades between minor version (1.4 to 1.5) PostGIS supplies a upgrade files. There are two such files in the PostGIS 1.5 distribution:</p>
+<ul class="simple">
+<li>postgis_upgrade_13_to_15.sql</li>
+<li>postgis_upgrade_14_to_15.sql</li>
+</ul>
+<p>To upgrade simply</p>
+<ul class="simple">
+<li>Install the new version of PostGIS</li>
+<li>Apply the appropriate upgrade file to all your PostGIS-enabled databases.</li>
+</ul>
+</div>
+<div class="section" id="patch-upgrades">
+<h4>Patch Upgrades<a class="headerlink" href="#patch-upgrades" title="Permalink to this headline">¶</a></h4>
+<p>For upgrades between patch version (1.5.2 to 1.5.3) PostGIS supplies a single upgrade file:</p>
+<ul class="simple">
+<li>postgis_upgrade_15_minor.sql</li>
+</ul>
+<p>To upgrade simply</p>
+<ul class="simple">
+<li>Install the new version of PostGIS</li>
+<li>Apply the upgrade file to all your PostGIS-enabled databases.</li>
+</ul>
+</div>
+</div>
+<div class="section" id="major-postgis-upgrades">
+<h3>Major PostGIS Upgrades<a class="headerlink" href="#major-postgis-upgrades" title="Permalink to this headline">¶</a></h3>
+<p>Major upgrades involve changes to the actual data format for the on-disk storage of geometry and geography data. As such, the data tables need to be re-written. The only way to achieve this is to dump (creating a neutral text-based output) and restore (writing the new table format to disk).</p>
+<p>To upgrade, you will have to dump your data first, as discussed in <a class="reference internal" href="backup.html#backup"><em>Section 32: PostgreSQL Backup and Restore</em></a>.</p>
+<div class="section" id="with-data-in-schemas">
+<h4>With Data in Schemas<a class="headerlink" href="#with-data-in-schemas" title="Permalink to this headline">¶</a></h4>
+<ul>
+<li><p class="first">Dump your data by schema.</p>
+<div class="highlight-python"><pre>pg_dump
+   --port=54321
+   --type=compressed
+   --file=yourschema.backup
+   --schema=yourschema
+   yourdatabase</pre>
+</div>
+</li>
+<li><p class="first">Install the new version of the PostGIS software.</p>
+</li>
+<li><p class="first">Create a new blank database, and enable PostGIS in it.</p>
+</li>
+<li><p class="first">Load your data using pg_restore.</p>
+<div class="highlight-python"><pre>pg_restore
+  --port=54321
+  --type=compressed
+  --dbname=yournewdatabase
+  yourschema.backup</pre>
+</div>
+</li>
+</ul>
+</div>
+<div class="section" id="without-data-in-schemas">
+<h4>Without Data in Schemas<a class="headerlink" href="#without-data-in-schemas" title="Permalink to this headline">¶</a></h4>
+<p>In this case you have to dump the whole database, which means the dump file will contain PostGIS function and type signatures, and old ones at that. Before loading that file back into the new database, we strip out all the PostGIS-specific bits using a magic script from the PostGIS distribution.</p>
+<ul>
+<li><p class="first">Dump your whole database, using the &#8220;compressed&#8221; backup format.</p>
+<div class="highlight-python"><pre>pg_dump
+   --port=54321
+   --type=compressed
+   --file=yourdatabase.backup yourdatabase</pre>
+</div>
+</li>
+<li><p class="first">Install the new version of the PostGIS software.</p>
+</li>
+<li><p class="first">Filter your database backup using the ./utils/postgis_restore.pl script from the new version of PostGIS.</p>
+<div class="highlight-python"><pre>postgis_restore.pl yourdatabase.backup &gt; yourdatabase.sql</pre>
+</div>
+</li>
+<li><p class="first">Create a new blank database, and enable PostGIS in it.</p>
+<div class="highlight-sql"><div class="highlight"><pre><span class="c1">-- New in PostGIS 2+ / PgSQL 9.1+</span>
+<span class="c1">-- Formal extensions replace hand loading sql files!</span>
+<span class="k">CREATE</span> <span class="n">EXTENSION</span> <span class="n">postgis</span><span class="p">;</span>
+</pre></div>
+</div>
+</li>
+<li><p class="first">Load the filtered data back into the new databaes</p>
+<div class="highlight-python"><pre>psql
+   --port=54321
+   --file=yourdatabase.sql
+   --dbname=yournewdatabase</pre>
+</div>
+</li>
+</ul>
+<p>You should now have an upgraded database ready to use.</p>
+</div>
+</div>
+</div>
+<div class="section" id="postgis-2-0-upgrade-issues">
+<h2>PostGIS 2.0 Upgrade Issues<a class="headerlink" href="#postgis-2-0-upgrade-issues" title="Permalink to this headline">¶</a></h2>
+<p>In addition to being a major upgrade, and therefore requiring a dump and restore, PostGIS 2.0 made some major changes to behaviour and functionality, some of which are user facing. If you are upgrading from 1.X to 2.X you&#8217;ll want to remain aware of these.</p>
+<div class="section" id="function-signatures">
+<h3>Function Signatures<a class="headerlink" href="#function-signatures" title="Permalink to this headline">¶</a></h3>
+<p>Not only are there new functions, to support new features, but PostGIS 2.0 <strong>removed a large number of old function signatures</strong>. In particular, most of the function variants that are not prefixed by &#8220;ST_&#8221; have been removed.</p>
+<p>For example, ST_Intersects() exists, but Intersects() no longer exists in PostGIS 2.0.</p>
+<p>For some client applications, upgrading the software to no longer use the old signatures is not an option. For those users, <strong>it is possible to restore the old signatures</strong>, by loading the <tt class="docutils literal"><span class="pre">legacy.sql</span></tt> file into your database.</p>
+<p>Loading <tt class="docutils literal"><span class="pre">legacy.sql</span></tt> reestablishes all the old function signatures as aliases to the new signatures.</p>
+</div>
+<div class="section" id="default-wkt-and-wkb">
+<h3>Default WKT and WKB<a class="headerlink" href="#default-wkt-and-wkb" title="Permalink to this headline">¶</a></h3>
+<p>Prior to PostGIS 2.0, the default forms of the ST_AsBinary() and ST_AsText() functions were the <a class="reference internal" href="glossary.html#term-ogc"><em class="xref std std-term">OGC</em></a> <a class="reference internal" href="glossary.html#term-sfsql"><em class="xref std std-term">SFSQL</em></a> defined versions, which only supported two dimensions. Running ST_AsBinary() and ST_AsText() on 3-D and 4-D features just caused the extra dimensions to be stripped, and the returns were 2-D.</p>
+<p>For PostGIS 2.0, the ISO SQL/MM definitions of ST_AsBinary() and ST_AsText() are used. For 2-D features, the representations are the same, so no changes will be noticed. For 3-D and 4-D features, however, legal representations in ISO SQL/MM exist, so the dimensions will no longer be stripped, and ISO text and binary results will be returned.</p>
+<p>For well-known text, that means that the type string will include dimensionality information, and there will be extra ordinates, eg:</p>
+<div class="highlight-python"><pre>POINT Z (0 0 0)
+LINESTRING ZM (0 0 0 0, 1 1 1 1)</pre>
+</div>
+<p>For well-known binaries, that means that the type number will be promoted by a multiple of 1000 to indicate the dimensionality.</p>
+<ul class="simple">
+<li>0 implies 2D</li>
+<li>1000 implied 3D with a Z</li>
+<li>2000 implies 3D with an M</li>
+<li>3000 implies 4D</li>
+</ul>
+<p>So, for example</p>
+<ul class="simple">
+<li>A POINT has type number 1, a POINT ZM has type number 3001</li>
+<li>A LINESTRING has type number 2, LINESTRING M has type number 2002.</li>
+</ul>
+</div>
+<div class="section" id="default-srid">
+<h3>Default SRID<a class="headerlink" href="#default-srid" title="Permalink to this headline">¶</a></h3>
+<p>For PostGIS 0.X and 1.X, the SRID assigned to geometries created without specifying an SRID was -1.</p>
+<p>For PostGIS 2.X, the SRID assigned to geometries created without specifying an SRID is 0.</p>
+<p>This is only important to client applications calling the ST_SRID() function and testing the result.</p>
+</div>
+<div class="section" id="srid-range-limits">
+<h3>SRID Range Limits<a class="headerlink" href="#srid-range-limits" title="Permalink to this headline">¶</a></h3>
+<p>In order to fit the SRID number into a limited address range in the PostgreSQL system tables, the range of values PostGIS 2.X supports for SRID numbers is actually smaller than the range supported in 1.X.</p>
+<p>Legal user-defined SRIDs in PostGIS 2.X are from 1 to 998999. The top 10000 SRIDs are retained by PostGIS for internal use.</p>
+</div>
+</div>
+</div>
+
+
+      <!-- Next/Prev -->
+      <div class="selfclear pagination-nav">
+          <div class="left"><strong>Previous</strong>: <a href="backup.html" title="previous chapter">Section 32: PostgreSQL Backup and Restore</a></div>
+          <div class="right"><strong>Next</strong>: <a href="postgis-functions.html" title="next chapter">Appendix A: PostGIS Functions</a></div>
+      </div>
+
+  </div> <!-- rightbar_main -->
+
+  <div id="rightbar_bar">
+    
+      <div id="toc" class="section">
+        <h4 class="pngfix">Page Contents</h4>
+        <ul>
+<li><a class="reference internal" href="#">Section 33: Software Upgrades</a><ul>
+<li><a class="reference internal" href="#upgrading-postgresql">Upgrading PostgreSQL</a><ul>
+<li><a class="reference internal" href="#minor-postgresql-upgrades">Minor PostgreSQL Upgrades</a></li>
+<li><a class="reference internal" href="#major-postgresql-upgrades">Major PostgreSQL Upgrades</a><ul>
+<li><a class="reference internal" href="#dump-restore">Dump/Restore</a></li>
+<li><a class="reference internal" href="#pg-upgrade">pg_upgrade</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#upgrading-postgis">Upgrading PostGIS</a><ul>
+<li><a class="reference internal" href="#minor-postgis-upgrades">Minor PostGIS Upgrades</a><ul>
+<li><a class="reference internal" href="#minor-upgrades">Minor Upgrades</a></li>
+<li><a class="reference internal" href="#patch-upgrades">Patch Upgrades</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#major-postgis-upgrades">Major PostGIS Upgrades</a><ul>
+<li><a class="reference internal" href="#with-data-in-schemas">With Data in Schemas</a></li>
+<li><a class="reference internal" href="#without-data-in-schemas">Without Data in Schemas</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#postgis-2-0-upgrade-issues">PostGIS 2.0 Upgrade Issues</a><ul>
+<li><a class="reference internal" href="#function-signatures">Function Signatures</a></li>
+<li><a class="reference internal" href="#default-wkt-and-wkb">Default WKT and WKB</a></li>
+<li><a class="reference internal" href="#default-srid">Default SRID</a></li>
+<li><a class="reference internal" href="#srid-range-limits">SRID Range Limits</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+        <div class="section-footer"></div>
+      </div>
+        <div class="section">
+          <h3>Continue Reading</h3>
+          <p style="margin-top:1em"><b>Previous:</b> <a href="backup.html" title="previous chapter">Section 32: PostgreSQL Backup and Restore</a></p>
+          <p><b>Next:</b> <a href="postgis-functions.html" title="next chapter">Appendix A: PostGIS Functions</a></p>
+          </ul>
+        </div>
+
+   <h4>About Boundless</h4>
+   <p>Boundless provides <a href="http://boundlessgeo.com/solutions/">commercial open source software</a> for internet mapping and geospatial application development. We are dedicated to the growth and support of open source software.</p>
+
+    <h4>License</h4>
+    <p>This work is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/3.0/">Creative Commons Non Commercial-Attribution-Share Alike 3.0 United States License</a>.  Feel free to use this material, but we ask that you please retain the Boundless branding, logos and style.</p>
+<p><a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/3.0/"><img alt="Creative Commons License" style="border-width:0" src="http://i.creativecommons.org/l/by-nc-sa/3.0/88x31.png" /></a></p>
+<!--
+<ul id="relatedlinks" class="selfclear">
+  <li class="first">
+    <a href="postgis-functions.html" title="Appendix A: PostGIS Functions"
+       accesskey="N">next</a></li>
+  <li>
+    <a href="backup.html" title="Section 32: PostgreSQL Backup and Restore"
+       accesskey="P">previous</a>|</li>
+</ul> -->
+  </div> <!-- rightbar_bar -->
+
+  </div> <!-- content -->
+  <div id="footer">
+    <footer id="colophon" class="site-footer" role="contentinfo">
+		<div class="container">
+			<div class="row">
+				<div class="span2">
+					<h5>Solutions</h5>
+					<div class="footer-solutions-menu">
+						<ul id="menu-solutions" class="menu">
+							<li><a href="http://boundlessgeo.com/solutions/">Overview</a></li>
+							<li><a href="http://boundlessgeo.com/opengeo-suite/">OpenGeo Suite</a></li>
+							<li><a href="http://boundlessgeo.com/solutions/mapmeter/">MapMeter</a></li>
+							<li><a href="http://boundlessgeo.com/solutions/solutions-software/">Software</a></li>
+							<li><a href="http://boundlessgeo.com/solutions/solutions-industry/">Industries</a></li>
+						</ul>
+					</div>
+				</div>
+				<div class="span2">
+					<h5>Resources</h5>
+					<div class="footer-resources-menu">
+						<ul id="menu-resources" class="menu">
+              <li><a href="http://boundlessgeo.com/resources/">Overview</a></li>
+							<li><a href="http://boundlessgeo.com/documentation/">Documentation</a></li>
+							<li><a href="http://boundlessgeo.com/resources/trainings/">Trainings</a></li>
+							<li><a href="http://workshops.boundlessgeo.com/">Workshops</a></li>
+							<li><a href="http://boundlessgeo.com/case-studies/">Case Studies</a></li>
+							<li><a href="http://boundlessgeo.com/resources/white-papers/">White Papers</a></li>
+						</ul>
+					</div>
+				</div>
+				<div class="span2">
+					<h5>About Us</h5>
+					<div class="footer-about-menu">
+						<ul id="menu-about-menu" class="menu">
+              <li><a href="http://boundlessgeo.com/about/">Overview</a></li>
+							<li><a href="http://boundlessgeo.com/why-boundless/">Why Boundless</a></li>
+							<li><a href="http://boundlessgeo.com/about/team/">Team</a></li>
+							<li><a href="http://boundlessgeo.com/resources/careers/">Careers</a></li>
+							<li><a href="http://boundlessgeo.com/resources/partners/">Partners</a></li>
+							<li><a href="http://boundlessgeo.com/blog/">Blog</a></li>
+							<li><a href="http://boundlessgeo.com/resources/news/">News &amp; Media</a></li>
+              <li><a href="http://boundlessgeo.com/general-information/">Contact</a></li>
+            </ul></div>
+  				</div>
+
+				<div class="span6 site-info">
+
+					<div class="row-fluid">
+						<div class="span6">
+							<h5>Contact</h5>
+							<p class="address">
+								<span>155 Water Street, Suite 4-10</span>
+								<span>Brooklyn, NY 11201</span>
+								<span>1-877-673-6436</span>
+								<span>contact@boundlessgeo.com</span>
+							</p>
+						</div>
+						<div class="span6">
+							<span class="social"><i class="twitter"></i><a href="https://twitter.com/boundlessgeo" target="_blank">Follow us on Twitter</a></span>
+							<span class="social"><i class="linkedIn"></i><a href="http://www.linkedin.com/company/boundlessgeo" target="_blank">Follow us on Linkedin</a></span>
+						</div>
+					</div>
+
+				</div>
+			</div>
+			<div class="row">
+				<div class="span12 footer-sub-menu">
+					<div class="menu-footer-menu-container">
+						<ul id="menu-footer-menu" class="menu">
+							<li><a href="http://boundlessgeo.com/terms-service/">Terms of Service</a></li>
+							<li><a href="http://boundlessgeo.com/privacy-policy/">Privacy Policy</a></li>
+							<li><a href="http://boundlessgeo.com/site-map/">Site Map</a></li>
+							<li><a href="http://boundlessgeo.com/">© Boundless</a></li>
+						</ul>
+					</div>
+				</div>
+			</div>
+		</div>
+		<a class="question btn btn-primary" href="http://boundlessgeo.com/general-information/?contact-variable=ask_a_question"><i class="bubble"></i>Ask A Question</a>
+	</footer>
+  </div><!-- footer -->
+
+</div><!-- container -->
+
+<script type="text/javascript" src="http://boundlessgeo.com/wp-content/themes/open-geo/js/dropdown.js"></script>
+<script type="text/javascript">
+var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+</script>
+<script type="text/javascript">
+try {
+var pageTracker = _gat._getTracker("UA-3879903-6");
+pageTracker._trackPageview();
+} catch(err) {}
+</script>
+
+  </body>
+</html>

@@ -1,0 +1,468 @@
+<!DOCTYPE html>
+<html lang="en-US" prefix="og: http://ogp.me/ns#">
+<head>
+  <meta charset="UTF-8">
+  
+  <title>Boundless : Introduction to PostGIS : Section 32: PostgreSQL Backup and Restore</title>
+
+  <link rel="profile" href="http://gmpg.org/xfn/11">
+  <link rel="stylesheet" href="http://boundlessgeo.com/wp-content/themes/open-geo/style.css" type="text/css"/>
+
+<link rel="stylesheet" id="style-css" href="http://boundlessgeo.com/wp-content/themes/open-geo/style.css?ver=3.6.1" type="text/css" media="all">
+  <link rel="stylesheet" href="_static/extra.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <!-- <link rel="stylesheet" type="text/css" href="http://opengeo.org/include/superfish/css/superfish.css" media="screen" /> -->
+
+  <script type="text/javascript" src="http://boundlessgeo.com/wordpress/wp-includes/js/jquery/jquery.js?ver=1.10.2"></script>
+  <script type="text/javascript" src="http://boundlessgeo.com/wordpress/wp-includes/js/jquery/jquery-migrate.min.js?ver=1.2.1"></script>
+
+  <script type="text/javascript">
+    var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '1.0',
+        COLLAPSE_MODINDEX: false,
+        FILE_SUFFIX: '.html'
+    };
+  </script>
+  <script type="text/javascript" src="_static/jquery.js"></script>
+  <script type="text/javascript" src="_static/underscore.js"></script>
+  <script type="text/javascript" src="_static/doctools.js"></script>
+  <script type="text/javascript" src="_static/searchtools.js"></script>
+  <script type="text/javascript" src="searchindex.js"></script>
+  <!-- 
+  <script type="text/javascript" src="http://opengeo.org/include/superfish/js/jquery-1.2.6.min.js"></script> 
+  <script type="text/javascript" src="http://opengeo.org/include/superfish/js/hoverIntent.js"></script>
+  <script type="text/javascript" src="http://opengeo.org/include/superfish/js/superfish.js"></script>
+  <script type="text/javascript" src="http://opengeo.org/include/superfish/js/supersubs.js"></script>
+  <script>
+	$(document).ready(function(){
+		$("ul.sf-menu").supersubs({
+		}).superfish();  // call supersubs first, then superfish, so that subs are
+						 // not display:none when measuring. Call before initialising
+						 // containing tabs for same reason.
+	});
+	</script>
+  -->
+  <link rel="shortcut icon" href="_static/favicon.ico"/>
+      <link rel="top" title="Introduction to PostGIS" href="index.html" />
+      <link rel="next" title="Section 33: Software Upgrades" href="upgrades.html" />
+      <link rel="prev" title="Section 31: PostgreSQL Schemas" href="schemas.html" />
+
+<script type="text/javascript" src="//use.typekit.net/ijz1lwt.js"></script>
+<script type="text/javascript">try{Typekit.load();}catch(e){}</script>
+
+<!--[if lt IE 9]>
+<script src="http://boundlessgeo.com/wp-content/themes/open-geo/js/html5.js" type="text/javascript"></script>
+<![endif]-->
+
+
+</head>
+<body class="page">
+
+	<div id="wrapper">
+		<header id="masthead" class="site-header" role="banner">
+			<div class="container">
+				<a href="http://boundlessgeo.com/" rel="home" id="logo"><img src="http://boundlessgeo.com/wp-content/themes/open-geo/images/logo.png"></a>
+
+				<div class="pull-right">
+					<div class="pull-left">
+						<div class="menu-main-container">
+							<ul id="menu-main" class="menu">
+                <li class="solutions-primary menu-item menu-item-type-post_type menu-item-object-page menu-item-22"><a href="http://boundlessgeo.com/solutions/">Solutions</a></li>
+                <li class="resources-primary menu-item menu-item-type-post_type menu-item-object-page current-menu-item page_item page-item-16 current_page_item menu-item-23"><a href="http://boundlessgeo.com/resources/">Resources</a></li>
+                <li class="about-primary menu-item menu-item-type-post_type menu-item-object-page menu-item-24"><a href="http://boundlessgeo.com/about/">About</a></li>
+                <li class="support-primary menu-item menu-item-type-post_type menu-item-object-page menu-item-25"><a href="http://boundlessgeo.com/support/">Support</a></li>
+							</ul>
+						</div>
+					</div>
+					<div class="search dropdown">
+					  <a class="dropdown-toggle" data-toggle="dropdown" href="#"><i class="search-icon"></i></a>
+						  <div class="dropdown-menu" role="menu" aria-labelledby="dLabel">
+							  <form method="get" id="searchform" class="searchform" action="http://boundlessgeo.com/" role="search">
+								  <label for="s" class="screen-reader-text">Search</label>
+							  <input type="search" class="field" name="s" value="" id="s" placeholder="Search …">
+							  <input type="submit" class="submit" id="searchsubmit" value="Search">
+							  </form>
+						  </div>
+					</div>
+					<div class="download-link">
+						<ul id="menu-download-link" class="menu">
+							<li id="menu-item-5817" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-5817">
+								<a href="http://boundlessgeo.com/download/">Download</a>
+							</li>
+						</ul>
+					</div>
+				</div>
+
+			</div><!--closes container-->
+
+		</header>
+<section class="resources page-resources">
+  <div class="secondarynav">
+     <div class="container">
+       	<div class="menu-resources-container">
+	   <ul id="menu-resources" class="menu">
+              <li id="menu-item-5892" class="menu-item menu-item-type-post_type menu-item-object-page current-menu-item page_item page-item-16 current_page_item menu-item-5892"><a href="http://boundlessgeo.com/resources/" >Overview</a></li>
+              <li id="menu-item-7099" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-7099"><a href="http://boundlessgeo.com/resources/documentation/" >Documentation</a></li>
+              <li id="menu-item-5885" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-5885"><a href="http://boundlessgeo.com/resources/trainings/" >Trainings</a></li>
+              <li id="menu-item-6432" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-6432"><a href="http://workshops.boundlessgeo.com/" >Workshops</a></li>
+              <li id="menu-item-5318" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-5318"><a href="http://boundlessgeo.com/resources/case-studies/" >Case Studies</a></li>
+              <li id="menu-item-5891" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-5891"><a href="http://boundlessgeo.com/resources/white-papers/" >White Papers</a></li>
+           </ul>
+         </div>		
+      </div>
+    </div>
+</section>
+<header class="page-header">
+	<div class="container">
+		<h1 class="page-title"><a href="index.html">Introduction to PostGIS</a></h1>
+		<p>PostGIS extends PostgreSQL with robust spatial database management capabilities. <a href="http://boundlessgeo.com/solutions/solutions-software/postgis/">More info</a></p>
+	</div>
+</header><div id="pageheading"><div class="contents"><h1>Introduction to PostGIS</h1></div></div>
+
+  <div id="content" class="contents">
+  <!--
+<div id="breadcrumbs">
+  <a href="http://boundlessgeo.com/">Home</a> &raquo;
+  <a href="http://boundlessgeo.com/resources/">Resources</a> &raquo;
+  <a href="http://workshops.boundlessgeo.com/">Workshops</a> &raquo;
+  <a href="index.html">Introduction to PostGIS</a>
+  
+     &raquo; <a href="">Section 32: PostgreSQL Backup and Restore</a>
+</div> -->
+
+  <div id="rightbar_main">
+      
+  <div class="section" id="section-32-postgresql-backup-and-restore">
+<span id="backup"></span><h1>Section 32: PostgreSQL Backup and Restore<a class="headerlink" href="#section-32-postgresql-backup-and-restore" title="Permalink to this headline">¶</a></h1>
+<p>There are lots of ways to backup a PostgreSQL database, and the one you choose will depend a great deal on how you are using the database.</p>
+<ul class="simple">
+<li>For relatively static databases, the basic pg_dump/pg_restore tools can be used to take periodic snapshots of the data.</li>
+<li>For frequently changing data, using an &#8220;online backup&#8221; scheme allows continuous archiving of updates to a secure location.</li>
+</ul>
+<p>Online backup is the basis for replication and stand-by systems for <a class="reference external" href="http://www.postgresql.org/docs/current/static/high-availability.html">high availability</a>, particularly for versions of PostgreSQL &gt;= 9.0.</p>
+<div class="section" id="laying-out-your-data">
+<h2>Laying Out your Data<a class="headerlink" href="#laying-out-your-data" title="Permalink to this headline">¶</a></h2>
+<p>As discussed in <a class="reference internal" href="schemas.html#schemas"><em>Section 31: PostgreSQL Schemas</em></a>, ensuring that production data is always stored in separate schemas is a very important <strong>best practice</strong> in managing data. There are two reasons:</p>
+<ul class="simple">
+<li>Backing up and restoring data in schemas is much simpler than managing lists of tables to be backed up individually.</li>
+<li>Keeping data tables out of the &#8220;public&#8221; schema allows far easier upgrades, as discussed in <a class="reference internal" href="upgrades.html#upgrades"><em>Section 33: Software Upgrades</em></a>.</li>
+</ul>
+</div>
+<div class="section" id="basic-backup-and-restore">
+<h2>Basic Backup and Restore<a class="headerlink" href="#basic-backup-and-restore" title="Permalink to this headline">¶</a></h2>
+<p>Backing up a full database is easy using the <a class="reference external" href="http://www.postgresql.org/docs/current/static/app-pgdump.html">pg_dump</a> utility. The utility is a command-line tool, which makes it easy to automate with scripting, and it can also be invoke via a GUI in the PgAdmin utility.</p>
+<p>To backup our <tt class="docutils literal"><span class="pre">nyc</span></tt> database, we can use the GUI, just right-click the database you want to backup:</p>
+<img alt="_images/backup1.jpg" src="_images/backup1.jpg" />
+<p>Enter the name of the backup file you want to create.</p>
+<img alt="_images/backup2.jpg" src="_images/backup2.jpg" />
+<p>Note that there are three backup format options: compress, tar and plain.</p>
+<ul class="simple">
+<li><strong>Plain</strong> is just a textual SQL file. This is the simplest format and in many ways the most flexible, since it can be editing or altered easily and then loaded back into a database, allowing offline changes to things like ownership or other global information.</li>
+<li><strong>Tar</strong> using a UNIX archive format to hold components of the dump in separate files. Using the tar format allows the <a class="reference external" href="http://www.postgresql.org/docs/current/static/app-pgrestore.html">pg_restore</a> utility to selectively restore parts of the dump.</li>
+<li><strong>Compress</strong> is like the Tar format, but compresses the internal components individually, allowing them to be selectively restored without decompressing the entire archive.</li>
+</ul>
+<p>We&#8217;ll check the Compress option and go, saving out a backup file.</p>
+<p>The same operation can be done with the command line like this:</p>
+<div class="highlight-python"><pre>pg_dump --file=nyc.backup --format=c --port=54321 --username=postgres nyc</pre>
+</div>
+<p>Because the backup file is in Compress format, we can view the contents using the <a class="reference external" href="http://www.postgresql.org/docs/current/static/app-pgrestore.html">pg_restore</a> command to list the manifest. In the PgAdmin GUI, &#8220;View&#8221; is an option in the panel.</p>
+<img alt="_images/backup3.jpg" src="_images/backup3.jpg" />
+<p>When you look at the manifest, one of the things you might notice is that there are a lot of &#8220;FUNCTION&#8221; signatures in there.</p>
+<img alt="_images/backup4.jpg" src="_images/backup4.jpg" />
+<p>That&#8217;s because the <a class="reference external" href="http://www.postgresql.org/docs/current/static/app-pgdump.html">pg_dump</a> utility dumps <strong>every</strong> non-system object in the database, and that includes the PostGIS function definitions.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">PostgreSQL 9.1+ includes an &#8220;EXTENSION&#8221; feature that allows add-on packages like PostGIS to be installed as registered system components and therefore excluded from <a class="reference external" href="http://www.postgresql.org/docs/current/static/app-pgdump.html">pg_dump</a> output. PostGIS 2.0 and higher support installation using this extension system.</p>
+</div>
+<p>We can see the same manifest from the command-line using <a class="reference external" href="http://www.postgresql.org/docs/current/static/app-pgrestore.html">pg_restore</a> directly:</p>
+<div class="highlight-python"><pre>pg_restore --list nyc.backup</pre>
+</div>
+<p>The problem with a dump file full of PostGIS function signatures is that we really wanted a dump of our data, not our system functions.</p>
+<p>Since every object is in the dump file, we can restore to a blank database and get full functionality. In doing so, we are expecting that system we are restoring to has exactly the same version of PostGIS as the one we dumped from (since the function signature definitions reference a particular version of the PostGIS shared library).</p>
+<p>From the command-line the restore looks like this:</p>
+<div class="highlight-python"><pre>createdb --port 54321 nyc2
+pg_restore --dbname=nyc2 --port 54321 --username=postgres nyc.backup</pre>
+</div>
+<p>Dumping just data, without function signatures, is where having data in schemas is handy, because there is a command-line flag to only dump a particular schema:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">pg_dump</span> <span class="o">--</span><span class="n">port</span><span class="o">=</span><span class="mi">54321</span> <span class="o">-</span><span class="n">format</span><span class="o">=</span><span class="n">c</span> <span class="o">--</span><span class="n">schema</span><span class="o">=</span><span class="n">census</span> <span class="o">--</span><span class="nb">file</span><span class="o">=</span><span class="n">census</span><span class="o">.</span><span class="n">backup</span>
+</pre></div>
+</div>
+<p>Now when we list the contents of the dump, we see just the data tables we wanted:</p>
+<div class="highlight-python"><pre>pg_restore --list census.backup
+
+;
+; Archive created at Thu Aug  9 11:02:49 2012
+;     dbname: nyc
+;     TOC Entries: 11
+;     Compression: -1
+;     Dump Version: 1.11-0
+;     Format: CUSTOM
+;     Integer: 4 bytes
+;     Offset: 8 bytes
+;     Dumped from database version: 8.4.9
+;     Dumped by pg_dump version: 8.4.9
+;
+;
+; Selected TOC Entries:
+;
+6; 2615 20091 SCHEMA - census postgres
+146; 1259 19845 TABLE census nyc_census_blocks postgres
+145; 1259 19843 SEQUENCE census nyc_census_blocks_gid_seq postgres
+2691; 0 0 SEQUENCE OWNED BY census nyc_census_blocks_gid_seq postgres
+2692; 0 0 SEQUENCE SET census nyc_census_blocks_gid_seq postgres
+2681; 2604 19848 DEFAULT census gid postgres
+2688; 0 19845 TABLE DATA census nyc_census_blocks postgres
+2686; 2606 19853 CONSTRAINT census nyc_census_blocks_pkey postgres
+2687; 1259 20078 INDEX census nyc_census_blocks_geom_gist postgres</pre>
+</div>
+<p>Having just the data tables is handy, because it means we can store to a database with any version of PostGIS installed, as we talk about in <a class="reference internal" href="upgrades.html#upgrades"><em>Section 33: Software Upgrades</em></a>.</p>
+<div class="section" id="backing-up-users">
+<h3>Backing Up Users<a class="headerlink" href="#backing-up-users" title="Permalink to this headline">¶</a></h3>
+<p>The <a class="reference external" href="http://www.postgresql.org/docs/current/static/app-pgdump.html">pg_dump</a> utility operates a database at a time (or a schema or table at a time, if you restrict it). However, information about users is is stored across an entire cluster, it&#8217;s not stored in any one database!</p>
+<p>To backup your user information, use the <a class="reference external" href="http://www.postgresql.org/docs/current/static/app-pg-dumpall.html">pg_dumpall</a> utility, with the &#8220;&#8211;globals-only&#8221; flag.</p>
+<div class="highlight-python"><pre>pg_dumpall --globals-only --port 54321</pre>
+</div>
+<p>You can also use <a class="reference external" href="http://www.postgresql.org/docs/current/static/app-pg-dumpall.html">pg_dumpall</a> in its default mode to backup an entire cluster, but be aware that, as with <a class="reference external" href="http://www.postgresql.org/docs/current/static/app-pgdump.html">pg_dump</a>, you will end up backing up the PostGIS function signatures, so the dump will have to be restored against an identical software installation, it can&#8217;t be used as part of an upgrade process.</p>
+</div>
+</div>
+<div class="section" id="online-backup-and-restore">
+<h2>Online Backup and Restore<a class="headerlink" href="#online-backup-and-restore" title="Permalink to this headline">¶</a></h2>
+<p>Online backup and restore allows an administrator to keep an extremely up-to-date set of backup files without the overhead of repeatedly dumping the entire database. If the database is under frequent insert and update load, then online backup might be preferable to basic backup.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">The best way to learn about online backup is to read the relevant sections of the PostgreSQL manual on <a class="reference external" href="http://www.postgresql.org/docs/current/static/continuous-archiving.html">continuous archiving and point-in-time recovery</a>. This section of the PostGIS workshop will just provide a brief snapshot of online backup set-up.</p>
+</div>
+<div class="section" id="how-it-works">
+<h3>How it Works<a class="headerlink" href="#how-it-works" title="Permalink to this headline">¶</a></h3>
+<p>Rather than continually write to the main data tables, PostgreSQL stores changes initially in &#8220;write-ahead logs&#8221; (WAL). Taken together, these logs are a complete record of all changes made to a database.  Online backup consists of taking a copy of the database main data table, then taking a copy of each WAL that is generated from then on.</p>
+<img alt="_images/backup5.jpg" src="_images/backup5.jpg" />
+<p>When it is time to recover to a new database, the system starts on the main data copy, then replays all the WAL files into the database. The end result is a restored database in the same state as the original at the time of the last WAL received.</p>
+<p>Because WAL are being written anyways, and transferring copies to an archive server is computationally cheap, online backup is an effective means of keeping a very up-to-date backup of a system without resorting to intensive regular full dumps.</p>
+</div>
+<div class="section" id="archiving-the-wal-files">
+<h3>Archiving the WAL Files<a class="headerlink" href="#archiving-the-wal-files" title="Permalink to this headline">¶</a></h3>
+<p>The first thing to do in setting up online backup is to create an archiving method. PostgreSQL archiving methods are the ultimate in flexibility: the PostgreSQL backend simply calls a script specified in the <tt class="docutils literal"><span class="pre">archive_command</span></tt> configuration parameter.</p>
+<p>That means archiving can be as simple as copying the file to a network-mounted drive, and as complex as encrypting and emailing the files to the remote archive. Any process you can script you can use to archive the files.</p>
+<p>To turn on archiving we will edit <tt class="docutils literal"><span class="pre">postgresql.conf</span></tt>, first turning on WAL archiving:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">wal_level</span> <span class="o">=</span> <span class="n">archive</span>
+<span class="n">archive_mode</span> <span class="o">=</span> <span class="n">on</span>
+</pre></div>
+</div>
+<p>And then setting the <tt class="docutils literal"><span class="pre">archive_command</span></tt> to copy our archive files to a safe location (changing the destination paths as appropriate):</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="c"># Unix</span>
+<span class="n">archive_command</span> <span class="o">=</span> <span class="s">&#39;test ! -f /archivedir/</span><span class="si">%f</span><span class="s"> &amp;&amp; cp %p /archivedir/</span><span class="si">%f</span><span class="s">&#39;</span>
+
+<span class="c"># Windows</span>
+<span class="n">archive_command</span> <span class="o">=</span> <span class="s">&#39;copy &quot;%p&quot; &quot;C:</span><span class="se">\\</span><span class="s">archivedir</span><span class="se">\\</span><span class="si">%f</span><span class="s">&quot;&#39;</span>
+</pre></div>
+</div>
+<p>It is important that the archive command not over-write existing files, so the unix command includes an initial test to ensure that the files aren&#8217;t already there. It is also important that the command returns a non-zero status if the copy process fails.</p>
+<p>Once the changes are made you can re-start PostgreSQL to make them effective.</p>
+</div>
+<div class="section" id="taking-the-base-backup">
+<h3>Taking the Base Backup<a class="headerlink" href="#taking-the-base-backup" title="Permalink to this headline">¶</a></h3>
+<p>Once the archiving process is in place, you need to take a base back-up.</p>
+<p>Put the database into backup mode (this doesn&#8217;t do anything to alter operation of queries or data updates, it just forces a checkpoint and writes a label file indicating when the backup was taken).</p>
+<div class="highlight-sql"><div class="highlight"><pre><span class="k">SELECT</span> <span class="n">pg_start_backup</span><span class="p">(</span><span class="s1">&#39;/archivedir/basebackup.tgz&#39;</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>For the label, using the path to the backup file is a good practice, as it helps you track down where the backup was stored.</p>
+<p>Copy the database to an archival location:</p>
+<div class="highlight-python"><pre># Unix
+tar cvfz /archivedir/basebackup.tgz ${PGDATA}</pre>
+</div>
+<p>Then tell the database the backup process is complete.</p>
+<div class="highlight-sql"><div class="highlight"><pre><span class="k">SELECT</span> <span class="n">pg_stop_backup</span><span class="p">();</span>
+</pre></div>
+</div>
+<p>All these steps can of course be scripted for regular base backups.</p>
+</div>
+<div class="section" id="restoring-from-the-archive">
+<h3>Restoring from the Archive<a class="headerlink" href="#restoring-from-the-archive" title="Permalink to this headline">¶</a></h3>
+<p>These steps are taking from the PostgreSQL manual on <a class="reference external" href="http://www.postgresql.org/docs/current/static/continuous-archiving.html">continuous archiving and point-in-time recovery</a>.</p>
+<ul class="simple">
+<li>Stop the server, if it&#8217;s running.</li>
+<li>If you have the space to do so, copy the whole cluster data directory and any tablespaces to a temporary location in case you need them later. Note that this precaution will require that you have enough free space on your system to hold two copies of your existing database. If you do not have enough space, you should at least save the contents of the cluster&#8217;s pg_xlog subdirectory, as it might contain logs which were not archived before the system went down.</li>
+<li>Remove all existing files and subdirectories under the cluster data directory and under the root directories of any tablespaces you are using.</li>
+<li>Restore the database files from your file system backup. Be sure that they are restored with the right ownership (the database system user, not root!) and with the right permissions. If you are using tablespaces, you should verify that the symbolic links in pg_tblspc/ were correctly restored.</li>
+<li>Remove any files present in pg_xlog/; these came from the file system backup and are therefore probably obsolete rather than current. If you didn&#8217;t archive pg_xlog/ at all, then recreate it with proper permissions, being careful to ensure that you re-establish it as a symbolic link if you had it set up that way before.</li>
+<li>If you have unarchived WAL segment files that you saved in step 2, copy them into pg_xlog/. (It is best to copy them, not move them, so you still have the unmodified files if a problem occurs and you have to start over.)</li>
+<li>Create a recovery command file recovery.conf in the cluster data directory (see Chapter 26). You might also want to temporarily modify pg_hba.conf to prevent ordinary users from connecting until you are sure the recovery was successful.</li>
+<li>Start the server. The server will go into recovery mode and proceed to read through the archived WAL files it needs. Should the recovery be terminated because of an external error, the server can simply be restarted and it will continue recovery. Upon completion of the recovery process, the server will rename recovery.conf to recovery.done (to prevent accidentally re-entering recovery mode later) and then commence normal database operations.</li>
+<li>Inspect the contents of the database to ensure you have recovered to the desired state. If not, return to step 1. If all is well, allow your users to connect by restoring pg_hba.conf to normal.</li>
+</ul>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">OpenGeo Suite version 2.X includes PostgreSQL 8.4, which only has support for using online backup as described above. In OpenGeo Suite 3.X, PostgreSQL 9.2 will be included, which will add options for continuous log streaming, and hot standby servers.</p>
+</div>
+</div>
+</div>
+<div class="section" id="links">
+<h2>Links<a class="headerlink" href="#links" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><a class="reference external" href="http://www.postgresql.org/docs/current/static/app-pgdump.html">pg_dump</a></li>
+<li><a class="reference external" href="http://www.postgresql.org/docs/current/static/app-pg-dumpall.html">pg_dumpall</a></li>
+<li><a class="reference external" href="http://www.postgresql.org/docs/current/static/app-pgrestore.html">pg_restore</a></li>
+<li><a class="reference external" href="http://www.postgresql.org/docs/current/static/high-availability.html">PostgreSQL High Availability</a></li>
+<li><a class="reference external" href="http://www.postgresql.org/docs/current/static/continuous-archiving.html">PostgreSQL High Availability Continuous Archiving and PITR</a></li>
+</ul>
+</div>
+</div>
+
+
+      <!-- Next/Prev -->
+      <div class="selfclear pagination-nav">
+          <div class="left"><strong>Previous</strong>: <a href="schemas.html" title="previous chapter">Section 31: PostgreSQL Schemas</a></div>
+          <div class="right"><strong>Next</strong>: <a href="upgrades.html" title="next chapter">Section 33: Software Upgrades</a></div>
+      </div>
+
+  </div> <!-- rightbar_main -->
+
+  <div id="rightbar_bar">
+    
+      <div id="toc" class="section">
+        <h4 class="pngfix">Page Contents</h4>
+        <ul>
+<li><a class="reference internal" href="#">Section 32: PostgreSQL Backup and Restore</a><ul>
+<li><a class="reference internal" href="#laying-out-your-data">Laying Out your Data</a></li>
+<li><a class="reference internal" href="#basic-backup-and-restore">Basic Backup and Restore</a><ul>
+<li><a class="reference internal" href="#backing-up-users">Backing Up Users</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#online-backup-and-restore">Online Backup and Restore</a><ul>
+<li><a class="reference internal" href="#how-it-works">How it Works</a></li>
+<li><a class="reference internal" href="#archiving-the-wal-files">Archiving the WAL Files</a></li>
+<li><a class="reference internal" href="#taking-the-base-backup">Taking the Base Backup</a></li>
+<li><a class="reference internal" href="#restoring-from-the-archive">Restoring from the Archive</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#links">Links</a></li>
+</ul>
+</li>
+</ul>
+
+        <div class="section-footer"></div>
+      </div>
+        <div class="section">
+          <h3>Continue Reading</h3>
+          <p style="margin-top:1em"><b>Previous:</b> <a href="schemas.html" title="previous chapter">Section 31: PostgreSQL Schemas</a></p>
+          <p><b>Next:</b> <a href="upgrades.html" title="next chapter">Section 33: Software Upgrades</a></p>
+          </ul>
+        </div>
+
+   <h4>About Boundless</h4>
+   <p>Boundless provides <a href="http://boundlessgeo.com/solutions/">commercial open source software</a> for internet mapping and geospatial application development. We are dedicated to the growth and support of open source software.</p>
+
+    <h4>License</h4>
+    <p>This work is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/3.0/">Creative Commons Non Commercial-Attribution-Share Alike 3.0 United States License</a>.  Feel free to use this material, but we ask that you please retain the Boundless branding, logos and style.</p>
+<p><a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/3.0/"><img alt="Creative Commons License" style="border-width:0" src="http://i.creativecommons.org/l/by-nc-sa/3.0/88x31.png" /></a></p>
+<!--
+<ul id="relatedlinks" class="selfclear">
+  <li class="first">
+    <a href="upgrades.html" title="Section 33: Software Upgrades"
+       accesskey="N">next</a></li>
+  <li>
+    <a href="schemas.html" title="Section 31: PostgreSQL Schemas"
+       accesskey="P">previous</a>|</li>
+</ul> -->
+  </div> <!-- rightbar_bar -->
+
+  </div> <!-- content -->
+  <div id="footer">
+    <footer id="colophon" class="site-footer" role="contentinfo">
+		<div class="container">
+			<div class="row">
+				<div class="span2">
+					<h5>Solutions</h5>
+					<div class="footer-solutions-menu">
+						<ul id="menu-solutions" class="menu">
+							<li><a href="http://boundlessgeo.com/solutions/">Overview</a></li>
+							<li><a href="http://boundlessgeo.com/opengeo-suite/">OpenGeo Suite</a></li>
+							<li><a href="http://boundlessgeo.com/solutions/mapmeter/">MapMeter</a></li>
+							<li><a href="http://boundlessgeo.com/solutions/solutions-software/">Software</a></li>
+							<li><a href="http://boundlessgeo.com/solutions/solutions-industry/">Industries</a></li>
+						</ul>
+					</div>
+				</div>
+				<div class="span2">
+					<h5>Resources</h5>
+					<div class="footer-resources-menu">
+						<ul id="menu-resources" class="menu">
+              <li><a href="http://boundlessgeo.com/resources/">Overview</a></li>
+							<li><a href="http://boundlessgeo.com/documentation/">Documentation</a></li>
+							<li><a href="http://boundlessgeo.com/resources/trainings/">Trainings</a></li>
+							<li><a href="http://workshops.boundlessgeo.com/">Workshops</a></li>
+							<li><a href="http://boundlessgeo.com/case-studies/">Case Studies</a></li>
+							<li><a href="http://boundlessgeo.com/resources/white-papers/">White Papers</a></li>
+						</ul>
+					</div>
+				</div>
+				<div class="span2">
+					<h5>About Us</h5>
+					<div class="footer-about-menu">
+						<ul id="menu-about-menu" class="menu">
+              <li><a href="http://boundlessgeo.com/about/">Overview</a></li>
+							<li><a href="http://boundlessgeo.com/why-boundless/">Why Boundless</a></li>
+							<li><a href="http://boundlessgeo.com/about/team/">Team</a></li>
+							<li><a href="http://boundlessgeo.com/resources/careers/">Careers</a></li>
+							<li><a href="http://boundlessgeo.com/resources/partners/">Partners</a></li>
+							<li><a href="http://boundlessgeo.com/blog/">Blog</a></li>
+							<li><a href="http://boundlessgeo.com/resources/news/">News &amp; Media</a></li>
+              <li><a href="http://boundlessgeo.com/general-information/">Contact</a></li>
+            </ul></div>
+  				</div>
+
+				<div class="span6 site-info">
+
+					<div class="row-fluid">
+						<div class="span6">
+							<h5>Contact</h5>
+							<p class="address">
+								<span>155 Water Street, Suite 4-10</span>
+								<span>Brooklyn, NY 11201</span>
+								<span>1-877-673-6436</span>
+								<span>contact@boundlessgeo.com</span>
+							</p>
+						</div>
+						<div class="span6">
+							<span class="social"><i class="twitter"></i><a href="https://twitter.com/boundlessgeo" target="_blank">Follow us on Twitter</a></span>
+							<span class="social"><i class="linkedIn"></i><a href="http://www.linkedin.com/company/boundlessgeo" target="_blank">Follow us on Linkedin</a></span>
+						</div>
+					</div>
+
+				</div>
+			</div>
+			<div class="row">
+				<div class="span12 footer-sub-menu">
+					<div class="menu-footer-menu-container">
+						<ul id="menu-footer-menu" class="menu">
+							<li><a href="http://boundlessgeo.com/terms-service/">Terms of Service</a></li>
+							<li><a href="http://boundlessgeo.com/privacy-policy/">Privacy Policy</a></li>
+							<li><a href="http://boundlessgeo.com/site-map/">Site Map</a></li>
+							<li><a href="http://boundlessgeo.com/">© Boundless</a></li>
+						</ul>
+					</div>
+				</div>
+			</div>
+		</div>
+		<a class="question btn btn-primary" href="http://boundlessgeo.com/general-information/?contact-variable=ask_a_question"><i class="bubble"></i>Ask A Question</a>
+	</footer>
+  </div><!-- footer -->
+
+</div><!-- container -->
+
+<script type="text/javascript" src="http://boundlessgeo.com/wp-content/themes/open-geo/js/dropdown.js"></script>
+<script type="text/javascript">
+var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+</script>
+<script type="text/javascript">
+try {
+var pageTracker = _gat._getTracker("UA-3879903-6");
+pageTracker._trackPageview();
+} catch(err) {}
+</script>
+
+  </body>
+</html>

@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html lang="en-US" prefix="og: http://ogp.me/ns#">
+<head>
+  <meta charset="UTF-8">
+  
+  <title>Boundless : Introduction to PostGIS : Section 26: Nearest-Neighbour Searching</title>
+
+  <link rel="profile" href="http://gmpg.org/xfn/11">
+  <link rel="stylesheet" href="http://boundlessgeo.com/wp-content/themes/open-geo/style.css" type="text/css"/>
+
+<link rel="stylesheet" id="style-css" href="http://boundlessgeo.com/wp-content/themes/open-geo/style.css?ver=3.6.1" type="text/css" media="all">
+  <link rel="stylesheet" href="_static/extra.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <!-- <link rel="stylesheet" type="text/css" href="http://opengeo.org/include/superfish/css/superfish.css" media="screen" /> -->
+
+  <script type="text/javascript" src="http://boundlessgeo.com/wordpress/wp-includes/js/jquery/jquery.js?ver=1.10.2"></script>
+  <script type="text/javascript" src="http://boundlessgeo.com/wordpress/wp-includes/js/jquery/jquery-migrate.min.js?ver=1.2.1"></script>
+
+  <script type="text/javascript">
+    var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '1.0',
+        COLLAPSE_MODINDEX: false,
+        FILE_SUFFIX: '.html'
+    };
+  </script>
+  <script type="text/javascript" src="_static/jquery.js"></script>
+  <script type="text/javascript" src="_static/underscore.js"></script>
+  <script type="text/javascript" src="_static/doctools.js"></script>
+  <script type="text/javascript" src="_static/searchtools.js"></script>
+  <script type="text/javascript" src="searchindex.js"></script>
+  <!-- 
+  <script type="text/javascript" src="http://opengeo.org/include/superfish/js/jquery-1.2.6.min.js"></script> 
+  <script type="text/javascript" src="http://opengeo.org/include/superfish/js/hoverIntent.js"></script>
+  <script type="text/javascript" src="http://opengeo.org/include/superfish/js/superfish.js"></script>
+  <script type="text/javascript" src="http://opengeo.org/include/superfish/js/supersubs.js"></script>
+  <script>
+	$(document).ready(function(){
+		$("ul.sf-menu").supersubs({
+		}).superfish();  // call supersubs first, then superfish, so that subs are
+						 // not display:none when measuring. Call before initialising
+						 // containing tabs for same reason.
+	});
+	</script>
+  -->
+  <link rel="shortcut icon" href="_static/favicon.ico"/>
+      <link rel="top" title="Introduction to PostGIS" href="index.html" />
+      <link rel="next" title="Section 27: Tracking Edit History using Triggers" href="history_tracking.html" />
+      <link rel="prev" title="Section 25: 3-D" href="3d.html" />
+
+<script type="text/javascript" src="//use.typekit.net/ijz1lwt.js"></script>
+<script type="text/javascript">try{Typekit.load();}catch(e){}</script>
+
+<!--[if lt IE 9]>
+<script src="http://boundlessgeo.com/wp-content/themes/open-geo/js/html5.js" type="text/javascript"></script>
+<![endif]-->
+
+
+</head>
+<body class="page">
+
+	<div id="wrapper">
+		<header id="masthead" class="site-header" role="banner">
+			<div class="container">
+				<a href="http://boundlessgeo.com/" rel="home" id="logo"><img src="http://boundlessgeo.com/wp-content/themes/open-geo/images/logo.png"></a>
+
+				<div class="pull-right">
+					<div class="pull-left">
+						<div class="menu-main-container">
+							<ul id="menu-main" class="menu">
+                <li class="solutions-primary menu-item menu-item-type-post_type menu-item-object-page menu-item-22"><a href="http://boundlessgeo.com/solutions/">Solutions</a></li>
+                <li class="resources-primary menu-item menu-item-type-post_type menu-item-object-page current-menu-item page_item page-item-16 current_page_item menu-item-23"><a href="http://boundlessgeo.com/resources/">Resources</a></li>
+                <li class="about-primary menu-item menu-item-type-post_type menu-item-object-page menu-item-24"><a href="http://boundlessgeo.com/about/">About</a></li>
+                <li class="support-primary menu-item menu-item-type-post_type menu-item-object-page menu-item-25"><a href="http://boundlessgeo.com/support/">Support</a></li>
+							</ul>
+						</div>
+					</div>
+					<div class="search dropdown">
+					  <a class="dropdown-toggle" data-toggle="dropdown" href="#"><i class="search-icon"></i></a>
+						  <div class="dropdown-menu" role="menu" aria-labelledby="dLabel">
+							  <form method="get" id="searchform" class="searchform" action="http://boundlessgeo.com/" role="search">
+								  <label for="s" class="screen-reader-text">Search</label>
+							  <input type="search" class="field" name="s" value="" id="s" placeholder="Search …">
+							  <input type="submit" class="submit" id="searchsubmit" value="Search">
+							  </form>
+						  </div>
+					</div>
+					<div class="download-link">
+						<ul id="menu-download-link" class="menu">
+							<li id="menu-item-5817" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-5817">
+								<a href="http://boundlessgeo.com/download/">Download</a>
+							</li>
+						</ul>
+					</div>
+				</div>
+
+			</div><!--closes container-->
+
+		</header>
+<section class="resources page-resources">
+  <div class="secondarynav">
+     <div class="container">
+       	<div class="menu-resources-container">
+	   <ul id="menu-resources" class="menu">
+              <li id="menu-item-5892" class="menu-item menu-item-type-post_type menu-item-object-page current-menu-item page_item page-item-16 current_page_item menu-item-5892"><a href="http://boundlessgeo.com/resources/" >Overview</a></li>
+              <li id="menu-item-7099" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-7099"><a href="http://boundlessgeo.com/resources/documentation/" >Documentation</a></li>
+              <li id="menu-item-5885" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-5885"><a href="http://boundlessgeo.com/resources/trainings/" >Trainings</a></li>
+              <li id="menu-item-6432" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-6432"><a href="http://workshops.boundlessgeo.com/" >Workshops</a></li>
+              <li id="menu-item-5318" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-5318"><a href="http://boundlessgeo.com/resources/case-studies/" >Case Studies</a></li>
+              <li id="menu-item-5891" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-5891"><a href="http://boundlessgeo.com/resources/white-papers/" >White Papers</a></li>
+           </ul>
+         </div>		
+      </div>
+    </div>
+</section>
+<header class="page-header">
+	<div class="container">
+		<h1 class="page-title"><a href="index.html">Introduction to PostGIS</a></h1>
+		<p>PostGIS extends PostgreSQL with robust spatial database management capabilities. <a href="http://boundlessgeo.com/solutions/solutions-software/postgis/">More info</a></p>
+	</div>
+</header><div id="pageheading"><div class="contents"><h1>Introduction to PostGIS</h1></div></div>
+
+  <div id="content" class="contents">
+  <!--
+<div id="breadcrumbs">
+  <a href="http://boundlessgeo.com/">Home</a> &raquo;
+  <a href="http://boundlessgeo.com/resources/">Resources</a> &raquo;
+  <a href="http://workshops.boundlessgeo.com/">Workshops</a> &raquo;
+  <a href="index.html">Introduction to PostGIS</a>
+  
+     &raquo; <a href="">Section 26: Nearest-Neighbour Searching</a>
+</div> -->
+
+  <div id="rightbar_main">
+      
+  <div class="section" id="section-26-nearest-neighbour-searching">
+<span id="knn"></span><h1>Section 26: Nearest-Neighbour Searching<a class="headerlink" href="#section-26-nearest-neighbour-searching" title="Permalink to this headline">¶</a></h1>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">This section refers to a feature that is only available with PostGIS 2.0 and higher.</p>
+</div>
+<div class="section" id="what-is-a-nearest-neighbour-search">
+<h2>What is a Nearest Neighbour Search?<a class="headerlink" href="#what-is-a-nearest-neighbour-search" title="Permalink to this headline">¶</a></h2>
+<p>A frequently posed spatial query is: &#8220;what is the nearest &lt;candidate feature&gt; to &lt;query feature&gt;?&#8221;</p>
+<p>Unlike a distance search, the &#8220;nearest neighbour&#8221; search doesn&#8217;t include any measurement restricting how far away candidate geometries might be, features of any distance away will be accepted, as long as they are the <em>nearest</em>. This poses a problem for traditional index-assisted queries, that require a search box, and therefore need some kind of measurement value to build the box.</p>
+<p>The naive way to carry out a nearest neighbour query is to order the candidate table by distance from the query geometry, and then take the record with the smallest distance:</p>
+<div class="highlight-sql"><div class="highlight"><pre><span class="c1">-- Closest street to Broad Street station is Wall St</span>
+<span class="k">SELECT</span> <span class="n">streets</span><span class="p">.</span><span class="n">gid</span><span class="p">,</span> <span class="n">streets</span><span class="p">.</span><span class="n">name</span>
+<span class="k">FROM</span>
+  <span class="n">nyc_streets</span> <span class="n">streets</span><span class="p">,</span>
+  <span class="n">nyc_subway_stations</span> <span class="n">subways</span>
+<span class="k">WHERE</span> <span class="n">subways</span><span class="p">.</span><span class="n">name</span> <span class="o">=</span> <span class="s1">&#39;Broad St&#39;</span>
+<span class="k">ORDER</span> <span class="k">BY</span> <span class="n">ST_Distance</span><span class="p">(</span><span class="n">streets</span><span class="p">.</span><span class="n">geom</span><span class="p">,</span> <span class="n">subways</span><span class="p">.</span><span class="n">geom</span><span class="p">)</span> <span class="k">ASC</span>
+<span class="k">LIMIT</span> <span class="mi">1</span><span class="p">;</span>
+</pre></div>
+</div>
+<p>The trouble with this approach is that it forces the database to calculate the distance between the query geometry and <em>every</em> feature in the table of candidate features, then sort them all. For a large table of  candidate features, it is not a reasonable approach.</p>
+<p>One way to improve performance is to add an index constraint to the search. This requires a magic number: what&#8217;s the smallest box we could search around the query geometry, and still come up with at least one candidate geometry?</p>
+<p>If you turn on timing, you can see the performance difference between the box-assisted query below and the simple query above.</p>
+<div class="highlight-sql"><div class="highlight"><pre><span class="c1">-- Closest street to Broad Street station is Wall St</span>
+<span class="k">SELECT</span> <span class="n">streets</span><span class="p">.</span><span class="n">gid</span><span class="p">,</span> <span class="n">streets</span><span class="p">.</span><span class="n">name</span>
+<span class="k">FROM</span>
+  <span class="n">nyc_streets</span> <span class="n">streets</span><span class="p">,</span>
+  <span class="n">nyc_subway_stations</span> <span class="n">subways</span>
+<span class="k">WHERE</span> <span class="n">subways</span><span class="p">.</span><span class="n">name</span> <span class="o">=</span> <span class="s1">&#39;Broad St&#39;</span>
+<span class="k">AND</span> <span class="n">streets</span><span class="p">.</span><span class="n">geom</span> <span class="o">&amp;&amp;</span> <span class="n">ST_Expand</span><span class="p">(</span><span class="n">subways</span><span class="p">.</span><span class="n">geom</span><span class="p">,</span> <span class="mi">200</span><span class="p">)</span> <span class="c1">-- Magic number: 200m</span>
+<span class="k">ORDER</span> <span class="k">BY</span> <span class="n">ST_Distance</span><span class="p">(</span><span class="n">streets</span><span class="p">.</span><span class="n">geom</span><span class="p">,</span> <span class="n">subways</span><span class="p">.</span><span class="n">geom</span><span class="p">)</span> <span class="k">ASC</span>
+<span class="k">LIMIT</span> <span class="mi">1</span><span class="p">;</span>
+</pre></div>
+</div>
+<p>The problem with this approach is the magic number of 200 meters. What if there had not happened to be any roads within 200m? We would have failed to come up with a result: there is always a nearest neighbour, it just might not be within 200m.</p>
+</div>
+<div class="section" id="index-based-knn">
+<h2>Index-based KNN<a class="headerlink" href="#index-based-knn" title="Permalink to this headline">¶</a></h2>
+<p>&#8220;KNN&#8221; stands for &#8220;K nearest neighbours&#8221;, where &#8220;K&#8221; is the number of neighbours you are looking for.</p>
+<p>KNN is a pure index based nearest neighbour search. By walking up and down the index, the search can find the nearest candidate geometries without using any magical search radius numbers, so the technique is suitable and high performance even for very large tables with highly variable data densities.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">The KNN feature is only available on PostGIS 2.0 with PostgreSQL 9.1 or greater.</p>
+</div>
+<p>The KNN system works by evaluating distances between bounding boxes inside the PostGIS R-Tree index.</p>
+<p>Because the index is built using the bounding boxes of geometries, the distances between any geometries that are not points will be inexact: they will be the distances between the bounding boxes of geometries.</p>
+<p>The syntax of the index-based KNN query places a special &#8220;index-based distance operator&#8221; in the ORDER BY clause of the query, in this case &#8220;&lt;-&gt;&#8221;. There are two index-based distance operators,</p>
+<ul class="simple">
+<li><strong>&lt;-&gt;</strong> means &#8220;distance between box centers&#8221;</li>
+<li><strong>&lt;#&gt;</strong> means &#8220;distance between box edges&#8221;</li>
+</ul>
+<p>One side of the index-based distance operator must be a literal geometry value. We can get away with a subquery that returns as single geometry, or we could include a <a class="reference internal" href="glossary.html#term-wkt"><em class="xref std std-term">WKT</em></a> geometry instead.</p>
+<div class="highlight-sql"><div class="highlight"><pre><span class="c1">-- Closest 10 streets to Broad Street station are ?</span>
+<span class="k">SELECT</span>
+  <span class="n">streets</span><span class="p">.</span><span class="n">gid</span><span class="p">,</span>
+  <span class="n">streets</span><span class="p">.</span><span class="n">name</span>
+<span class="k">FROM</span>
+  <span class="n">nyc_streets</span> <span class="n">streets</span>
+<span class="k">ORDER</span> <span class="k">BY</span>
+  <span class="n">streets</span><span class="p">.</span><span class="n">geom</span> <span class="o">&lt;-&gt;</span>
+  <span class="p">(</span><span class="k">SELECT</span> <span class="n">geom</span> <span class="k">FROM</span> <span class="n">nyc_subway_stations</span> <span class="k">WHERE</span> <span class="n">name</span> <span class="o">=</span> <span class="s1">&#39;Broad St&#39;</span><span class="p">)</span>
+<span class="k">LIMIT</span> <span class="mi">10</span><span class="p">;</span>
+
+<span class="c1">-- Same query using a geometry EWKT literal</span>
+
+<span class="k">SELECT</span> <span class="n">ST_AsEWKT</span><span class="p">(</span><span class="n">geom</span><span class="p">)</span>
+<span class="k">FROM</span> <span class="n">nyc_subway_stations</span>
+<span class="k">WHERE</span> <span class="n">name</span> <span class="o">=</span> <span class="s1">&#39;Broad St&#39;</span><span class="p">;</span>
+<span class="c1">-- SRID=26918;POINT(583571 4506714)</span>
+
+<span class="k">SELECT</span>
+  <span class="n">streets</span><span class="p">.</span><span class="n">gid</span><span class="p">,</span>
+  <span class="n">streets</span><span class="p">.</span><span class="n">name</span><span class="p">,</span>
+  <span class="n">ST_Distance</span><span class="p">(</span>
+    <span class="n">streets</span><span class="p">.</span><span class="n">geom</span><span class="p">,</span>
+    <span class="s1">&#39;SRID=26918;POINT(583571.905921312 4506714.34119218)&#39;</span><span class="p">::</span><span class="n">geometry</span>
+    <span class="p">)</span> <span class="k">AS</span> <span class="n">distance</span>
+<span class="k">FROM</span>
+  <span class="n">nyc_streets</span> <span class="n">streets</span>
+<span class="k">ORDER</span> <span class="k">BY</span>
+  <span class="n">streets</span><span class="p">.</span><span class="n">geom</span> <span class="o">&lt;-&gt;</span>
+  <span class="s1">&#39;SRID=26918;POINT(583571.905921312 4506714.34119218)&#39;</span><span class="p">::</span><span class="n">geometry</span>
+<span class="k">LIMIT</span> <span class="mi">10</span><span class="p">;</span>
+</pre></div>
+</div>
+<p>The results of the second query show how odd the index-based query on non-point geometries can appear at first glance.   Wall Street is coming up third in our list, even though the absolute distance from the station to the street is 0.714 meters!</p>
+<div class="highlight-python"><pre>  gid  |     name     |     distance
+-------+--------------+-------------------
+ 17360 | Exchange Pl  |    101.6241843136
+ 17350 | New St       |  63.9499165490674
+ 17385 | Wall St      | 0.714202224374917
+ 17332 | Exchange Aly |  159.618545539243
+ 17402 | Pine St      |  75.8461038368021
+ 17347 | Cedar St     |  133.009278387597
+ 17335 | Beaver St    |  221.988864601724
+ 17314 | Trinity Pl   |  205.942231743204
+ 17515 | Hanover St   |  198.414568622805
+ 17345 | Thames St    |  167.802276238319</pre>
+</div>
+<p>Remember that all the calculations are being done on bounding boxes. The bounding box of the station point is just the point itself, so there is no approximation there. <strong>But the bounding boxes of the streets aren&#8217;t the same as the street lines.</strong> Here&#8217;s what the boxes of the top ten closest streets look like:</p>
+<img alt="_images/knn1.jpg" src="_images/knn1.jpg" />
+<p>We can see that the station falls right on the Wall Street line, and within the Wall Street box, but this index ordering is controlled by the <strong>&lt;-&gt;</strong> operator, which calculates distance between box centers. The centers of the boxes look like this:</p>
+<img alt="_images/knn2.jpg" src="_images/knn2.jpg" />
+<p>Now it is clear why Wall Street isn&#8217;t showing up as the first item in our search. The center of the Wall Street box is indeed further from the station than the centers of the Exchange Place and New Street boxes.</p>
+<p>What about the <strong>&lt;#&gt;</strong> operator? If we calculate the distance between box edges, the station would fall <strong>inside</strong> the Wall Street box, giving it a distance of zero and the first entry in the list, right?</p>
+<div class="highlight-sql"><div class="highlight"><pre><span class="c1">-- Closest 10 streets to Broad Street station are ?</span>
+<span class="k">SELECT</span>
+  <span class="n">streets</span><span class="p">.</span><span class="n">gid</span><span class="p">,</span>
+  <span class="n">streets</span><span class="p">.</span><span class="n">name</span>
+<span class="k">FROM</span>
+  <span class="n">nyc_streets</span> <span class="n">streets</span>
+<span class="k">ORDER</span> <span class="k">BY</span>
+  <span class="n">streets</span><span class="p">.</span><span class="n">geom</span> <span class="o">&lt;#&gt;</span>
+  <span class="s1">&#39;SRID=26918;POINT(583571.905921312 4506714.34119218)&#39;</span><span class="p">::</span><span class="n">geometry</span>
+<span class="k">LIMIT</span> <span class="mi">10</span><span class="p">;</span>
+</pre></div>
+</div>
+<p>Unfortunately, no.</p>
+<div class="highlight-python"><pre>  gid  |                               name
+-------+------------------------------------------------------------------
+ 19088 | FDR Dr
+ 17315 | Broadway
+ 19087 | FDR Dr
+ 17402 | Pine St
+ 17385 | Wall St
+ 17357 | South St
+ 17308 | Pearl St
+ 17235 | West Side Highway; West St; West Side Highway; West Side Highway
+ 17230 |
+ 17390 | Broad St</pre>
+</div>
+<p>There are a number of large street features with big boxes that <strong>also</strong> overlap the station and yield a box distance of zero.</p>
+<img alt="_images/knn3.jpg" src="_images/knn3.jpg" />
+<p>The right way to get a high-performance&#8211;yet accurate&#8211;nearest neighbour calculation is to recognize that you&#8217;ll have to pull the top 100 (or a smaller number if you feel certain your data is more homogeneous in distribution) possible results in a sub-query, calculate the true distance for all of them, and return the closest record from that set.</p>
+<div class="highlight-sql"><div class="highlight"><pre><span class="c1">-- &quot;Closest&quot; 100 streets to Broad Street station are?</span>
+<span class="k">WITH</span> <span class="n">closest_candidates</span> <span class="k">AS</span> <span class="p">(</span>
+  <span class="k">SELECT</span>
+    <span class="n">streets</span><span class="p">.</span><span class="n">gid</span><span class="p">,</span>
+    <span class="n">streets</span><span class="p">.</span><span class="n">name</span><span class="p">,</span>
+    <span class="n">streets</span><span class="p">.</span><span class="n">geom</span>
+  <span class="k">FROM</span>
+    <span class="n">nyc_streets</span> <span class="n">streets</span>
+  <span class="k">ORDER</span> <span class="k">BY</span>
+    <span class="n">streets</span><span class="p">.</span><span class="n">geom</span> <span class="o">&lt;-&gt;</span>
+    <span class="s1">&#39;SRID=26918;POINT(583571.905921312 4506714.34119218)&#39;</span><span class="p">::</span><span class="n">geometry</span>
+  <span class="k">LIMIT</span> <span class="mi">100</span>
+<span class="p">)</span>
+<span class="k">SELECT</span> <span class="n">gid</span><span class="p">,</span> <span class="n">name</span>
+<span class="k">FROM</span> <span class="n">closest_candidates</span>
+<span class="k">ORDER</span> <span class="k">BY</span>
+  <span class="n">ST_Distance</span><span class="p">(</span>
+    <span class="n">geom</span><span class="p">,</span>
+    <span class="s1">&#39;SRID=26918;POINT(583571.905921312 4506714.34119218)&#39;</span><span class="p">::</span><span class="n">geometry</span>
+    <span class="p">)</span>
+<span class="k">LIMIT</span> <span class="mi">1</span><span class="p">;</span>
+</pre></div>
+</div>
+<p>Note that when querying a point table, because the boxes are identical to the points you can use the index-sorted result directly and dispense with the sub-query.</p>
+<div class="highlight-sql"><div class="highlight"><pre><span class="c1">-- The 10 nearest stations to Broad St station</span>
+<span class="k">SELECT</span> <span class="n">gid</span><span class="p">,</span> <span class="n">name</span>
+<span class="k">FROM</span> <span class="n">nyc_subway_stations</span>
+<span class="k">ORDER</span> <span class="k">BY</span> <span class="n">geom</span> <span class="o">&lt;-&gt;</span> <span class="s1">&#39;SRID=26918;POINT(583571.905921312 4506714.34119218)&#39;</span><span class="p">::</span><span class="n">geometry</span>
+<span class="k">LIMIT</span> <span class="mi">10</span><span class="p">;</span>
+</pre></div>
+</div>
+</div>
+</div>
+
+
+      <!-- Next/Prev -->
+      <div class="selfclear pagination-nav">
+          <div class="left"><strong>Previous</strong>: <a href="3d.html" title="previous chapter">Section 25: 3-D</a></div>
+          <div class="right"><strong>Next</strong>: <a href="history_tracking.html" title="next chapter">Section 27: Tracking Edit History using Triggers</a></div>
+      </div>
+
+  </div> <!-- rightbar_main -->
+
+  <div id="rightbar_bar">
+    
+      <div id="toc" class="section">
+        <h4 class="pngfix">Page Contents</h4>
+        <ul>
+<li><a class="reference internal" href="#">Section 26: Nearest-Neighbour Searching</a><ul>
+<li><a class="reference internal" href="#what-is-a-nearest-neighbour-search">What is a Nearest Neighbour Search?</a></li>
+<li><a class="reference internal" href="#index-based-knn">Index-based KNN</a></li>
+</ul>
+</li>
+</ul>
+
+        <div class="section-footer"></div>
+      </div>
+        <div class="section">
+          <h3>Continue Reading</h3>
+          <p style="margin-top:1em"><b>Previous:</b> <a href="3d.html" title="previous chapter">Section 25: 3-D</a></p>
+          <p><b>Next:</b> <a href="history_tracking.html" title="next chapter">Section 27: Tracking Edit History using Triggers</a></p>
+          </ul>
+        </div>
+
+   <h4>About Boundless</h4>
+   <p>Boundless provides <a href="http://boundlessgeo.com/solutions/">commercial open source software</a> for internet mapping and geospatial application development. We are dedicated to the growth and support of open source software.</p>
+
+    <h4>License</h4>
+    <p>This work is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/3.0/">Creative Commons Non Commercial-Attribution-Share Alike 3.0 United States License</a>.  Feel free to use this material, but we ask that you please retain the Boundless branding, logos and style.</p>
+<p><a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/3.0/"><img alt="Creative Commons License" style="border-width:0" src="http://i.creativecommons.org/l/by-nc-sa/3.0/88x31.png" /></a></p>
+<!--
+<ul id="relatedlinks" class="selfclear">
+  <li class="first">
+    <a href="history_tracking.html" title="Section 27: Tracking Edit History using Triggers"
+       accesskey="N">next</a></li>
+  <li>
+    <a href="3d.html" title="Section 25: 3-D"
+       accesskey="P">previous</a>|</li>
+</ul> -->
+  </div> <!-- rightbar_bar -->
+
+  </div> <!-- content -->
+  <div id="footer">
+    <footer id="colophon" class="site-footer" role="contentinfo">
+		<div class="container">
+			<div class="row">
+				<div class="span2">
+					<h5>Solutions</h5>
+					<div class="footer-solutions-menu">
+						<ul id="menu-solutions" class="menu">
+							<li><a href="http://boundlessgeo.com/solutions/">Overview</a></li>
+							<li><a href="http://boundlessgeo.com/opengeo-suite/">OpenGeo Suite</a></li>
+							<li><a href="http://boundlessgeo.com/solutions/mapmeter/">MapMeter</a></li>
+							<li><a href="http://boundlessgeo.com/solutions/solutions-software/">Software</a></li>
+							<li><a href="http://boundlessgeo.com/solutions/solutions-industry/">Industries</a></li>
+						</ul>
+					</div>
+				</div>
+				<div class="span2">
+					<h5>Resources</h5>
+					<div class="footer-resources-menu">
+						<ul id="menu-resources" class="menu">
+              <li><a href="http://boundlessgeo.com/resources/">Overview</a></li>
+							<li><a href="http://boundlessgeo.com/documentation/">Documentation</a></li>
+							<li><a href="http://boundlessgeo.com/resources/trainings/">Trainings</a></li>
+							<li><a href="http://workshops.boundlessgeo.com/">Workshops</a></li>
+							<li><a href="http://boundlessgeo.com/case-studies/">Case Studies</a></li>
+							<li><a href="http://boundlessgeo.com/resources/white-papers/">White Papers</a></li>
+						</ul>
+					</div>
+				</div>
+				<div class="span2">
+					<h5>About Us</h5>
+					<div class="footer-about-menu">
+						<ul id="menu-about-menu" class="menu">
+              <li><a href="http://boundlessgeo.com/about/">Overview</a></li>
+							<li><a href="http://boundlessgeo.com/why-boundless/">Why Boundless</a></li>
+							<li><a href="http://boundlessgeo.com/about/team/">Team</a></li>
+							<li><a href="http://boundlessgeo.com/resources/careers/">Careers</a></li>
+							<li><a href="http://boundlessgeo.com/resources/partners/">Partners</a></li>
+							<li><a href="http://boundlessgeo.com/blog/">Blog</a></li>
+							<li><a href="http://boundlessgeo.com/resources/news/">News &amp; Media</a></li>
+              <li><a href="http://boundlessgeo.com/general-information/">Contact</a></li>
+            </ul></div>
+  				</div>
+
+				<div class="span6 site-info">
+
+					<div class="row-fluid">
+						<div class="span6">
+							<h5>Contact</h5>
+							<p class="address">
+								<span>155 Water Street, Suite 4-10</span>
+								<span>Brooklyn, NY 11201</span>
+								<span>1-877-673-6436</span>
+								<span>contact@boundlessgeo.com</span>
+							</p>
+						</div>
+						<div class="span6">
+							<span class="social"><i class="twitter"></i><a href="https://twitter.com/boundlessgeo" target="_blank">Follow us on Twitter</a></span>
+							<span class="social"><i class="linkedIn"></i><a href="http://www.linkedin.com/company/boundlessgeo" target="_blank">Follow us on Linkedin</a></span>
+						</div>
+					</div>
+
+				</div>
+			</div>
+			<div class="row">
+				<div class="span12 footer-sub-menu">
+					<div class="menu-footer-menu-container">
+						<ul id="menu-footer-menu" class="menu">
+							<li><a href="http://boundlessgeo.com/terms-service/">Terms of Service</a></li>
+							<li><a href="http://boundlessgeo.com/privacy-policy/">Privacy Policy</a></li>
+							<li><a href="http://boundlessgeo.com/site-map/">Site Map</a></li>
+							<li><a href="http://boundlessgeo.com/">© Boundless</a></li>
+						</ul>
+					</div>
+				</div>
+			</div>
+		</div>
+		<a class="question btn btn-primary" href="http://boundlessgeo.com/general-information/?contact-variable=ask_a_question"><i class="bubble"></i>Ask A Question</a>
+	</footer>
+  </div><!-- footer -->
+
+</div><!-- container -->
+
+<script type="text/javascript" src="http://boundlessgeo.com/wp-content/themes/open-geo/js/dropdown.js"></script>
+<script type="text/javascript">
+var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+</script>
+<script type="text/javascript">
+try {
+var pageTracker = _gat._getTracker("UA-3879903-6");
+pageTracker._trackPageview();
+} catch(err) {}
+</script>
+
+  </body>
+</html>

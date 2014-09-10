@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="en-US" prefix="og: http://ogp.me/ns#">
+<head>
+  <meta charset="UTF-8">
+  
+  <title>Boundless : Introduction to PostGIS : Section 9: Geometry Exercises</title>
+
+  <link rel="profile" href="http://gmpg.org/xfn/11">
+  <link rel="stylesheet" href="http://boundlessgeo.com/wp-content/themes/open-geo/style.css" type="text/css"/>
+
+<link rel="stylesheet" id="style-css" href="http://boundlessgeo.com/wp-content/themes/open-geo/style.css?ver=3.6.1" type="text/css" media="all">
+  <link rel="stylesheet" href="_static/extra.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <!-- <link rel="stylesheet" type="text/css" href="http://opengeo.org/include/superfish/css/superfish.css" media="screen" /> -->
+
+  <script type="text/javascript" src="http://boundlessgeo.com/wordpress/wp-includes/js/jquery/jquery.js?ver=1.10.2"></script>
+  <script type="text/javascript" src="http://boundlessgeo.com/wordpress/wp-includes/js/jquery/jquery-migrate.min.js?ver=1.2.1"></script>
+
+  <script type="text/javascript">
+    var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '1.0',
+        COLLAPSE_MODINDEX: false,
+        FILE_SUFFIX: '.html'
+    };
+  </script>
+  <script type="text/javascript" src="_static/jquery.js"></script>
+  <script type="text/javascript" src="_static/underscore.js"></script>
+  <script type="text/javascript" src="_static/doctools.js"></script>
+  <script type="text/javascript" src="_static/searchtools.js"></script>
+  <script type="text/javascript" src="searchindex.js"></script>
+  <!-- 
+  <script type="text/javascript" src="http://opengeo.org/include/superfish/js/jquery-1.2.6.min.js"></script> 
+  <script type="text/javascript" src="http://opengeo.org/include/superfish/js/hoverIntent.js"></script>
+  <script type="text/javascript" src="http://opengeo.org/include/superfish/js/superfish.js"></script>
+  <script type="text/javascript" src="http://opengeo.org/include/superfish/js/supersubs.js"></script>
+  <script>
+	$(document).ready(function(){
+		$("ul.sf-menu").supersubs({
+		}).superfish();  // call supersubs first, then superfish, so that subs are
+						 // not display:none when measuring. Call before initialising
+						 // containing tabs for same reason.
+	});
+	</script>
+  -->
+  <link rel="shortcut icon" href="_static/favicon.ico"/>
+      <link rel="top" title="Introduction to PostGIS" href="index.html" />
+      <link rel="next" title="Section 10: Spatial Relationships" href="spatial_relationships.html" />
+      <link rel="prev" title="Section 8: Geometries" href="geometries.html" />
+
+<script type="text/javascript" src="//use.typekit.net/ijz1lwt.js"></script>
+<script type="text/javascript">try{Typekit.load();}catch(e){}</script>
+
+<!--[if lt IE 9]>
+<script src="http://boundlessgeo.com/wp-content/themes/open-geo/js/html5.js" type="text/javascript"></script>
+<![endif]-->
+
+
+</head>
+<body class="page">
+
+	<div id="wrapper">
+		<header id="masthead" class="site-header" role="banner">
+			<div class="container">
+				<a href="http://boundlessgeo.com/" rel="home" id="logo"><img src="http://boundlessgeo.com/wp-content/themes/open-geo/images/logo.png"></a>
+
+				<div class="pull-right">
+					<div class="pull-left">
+						<div class="menu-main-container">
+							<ul id="menu-main" class="menu">
+                <li class="solutions-primary menu-item menu-item-type-post_type menu-item-object-page menu-item-22"><a href="http://boundlessgeo.com/solutions/">Solutions</a></li>
+                <li class="resources-primary menu-item menu-item-type-post_type menu-item-object-page current-menu-item page_item page-item-16 current_page_item menu-item-23"><a href="http://boundlessgeo.com/resources/">Resources</a></li>
+                <li class="about-primary menu-item menu-item-type-post_type menu-item-object-page menu-item-24"><a href="http://boundlessgeo.com/about/">About</a></li>
+                <li class="support-primary menu-item menu-item-type-post_type menu-item-object-page menu-item-25"><a href="http://boundlessgeo.com/support/">Support</a></li>
+							</ul>
+						</div>
+					</div>
+					<div class="search dropdown">
+					  <a class="dropdown-toggle" data-toggle="dropdown" href="#"><i class="search-icon"></i></a>
+						  <div class="dropdown-menu" role="menu" aria-labelledby="dLabel">
+							  <form method="get" id="searchform" class="searchform" action="http://boundlessgeo.com/" role="search">
+								  <label for="s" class="screen-reader-text">Search</label>
+							  <input type="search" class="field" name="s" value="" id="s" placeholder="Search …">
+							  <input type="submit" class="submit" id="searchsubmit" value="Search">
+							  </form>
+						  </div>
+					</div>
+					<div class="download-link">
+						<ul id="menu-download-link" class="menu">
+							<li id="menu-item-5817" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-5817">
+								<a href="http://boundlessgeo.com/download/">Download</a>
+							</li>
+						</ul>
+					</div>
+				</div>
+
+			</div><!--closes container-->
+
+		</header>
+<section class="resources page-resources">
+  <div class="secondarynav">
+     <div class="container">
+       	<div class="menu-resources-container">
+	   <ul id="menu-resources" class="menu">
+              <li id="menu-item-5892" class="menu-item menu-item-type-post_type menu-item-object-page current-menu-item page_item page-item-16 current_page_item menu-item-5892"><a href="http://boundlessgeo.com/resources/" >Overview</a></li>
+              <li id="menu-item-7099" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-7099"><a href="http://boundlessgeo.com/resources/documentation/" >Documentation</a></li>
+              <li id="menu-item-5885" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-5885"><a href="http://boundlessgeo.com/resources/trainings/" >Trainings</a></li>
+              <li id="menu-item-6432" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-6432"><a href="http://workshops.boundlessgeo.com/" >Workshops</a></li>
+              <li id="menu-item-5318" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-5318"><a href="http://boundlessgeo.com/resources/case-studies/" >Case Studies</a></li>
+              <li id="menu-item-5891" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-5891"><a href="http://boundlessgeo.com/resources/white-papers/" >White Papers</a></li>
+           </ul>
+         </div>		
+      </div>
+    </div>
+</section>
+<header class="page-header">
+	<div class="container">
+		<h1 class="page-title"><a href="index.html">Introduction to PostGIS</a></h1>
+		<p>PostGIS extends PostgreSQL with robust spatial database management capabilities. <a href="http://boundlessgeo.com/solutions/solutions-software/postgis/">More info</a></p>
+	</div>
+</header><div id="pageheading"><div class="contents"><h1>Introduction to PostGIS</h1></div></div>
+
+  <div id="content" class="contents">
+  <!--
+<div id="breadcrumbs">
+  <a href="http://boundlessgeo.com/">Home</a> &raquo;
+  <a href="http://boundlessgeo.com/resources/">Resources</a> &raquo;
+  <a href="http://workshops.boundlessgeo.com/">Workshops</a> &raquo;
+  <a href="index.html">Introduction to PostGIS</a>
+  
+     &raquo; <a href="">Section 9: Geometry Exercises</a>
+</div> -->
+
+  <div id="rightbar_main">
+      
+  <div class="section" id="section-9-geometry-exercises">
+<span id="geometries-exercises"></span><h1>Section 9: Geometry Exercises<a class="headerlink" href="#section-9-geometry-exercises" title="Permalink to this headline">¶</a></h1>
+<p>Here&#8217;s a reminder of all the functions we have seen so far. They should be useful for the exercises!</p>
+<ul class="simple">
+<li><strong class="command">sum(expression)</strong> aggregate to return a sum for a set of records</li>
+<li><strong class="command">count(expression)</strong> aggregate to return the size of a set of records</li>
+<li><strong class="command">ST_GeometryType(geometry)</strong> returns the type of the geometry</li>
+<li><strong class="command">ST_NDims(geometry)</strong> returns the number of dimensions of the geometry</li>
+<li><strong class="command">ST_SRID(geometry)</strong> returns the spatial reference identifier number of the geometry</li>
+<li><strong class="command">ST_X(point)</strong> returns the X ordinate</li>
+<li><strong class="command">ST_Y(point)</strong> returns the Y ordinate</li>
+<li><strong class="command">ST_Length(linestring)</strong> returns the length of the linestring</li>
+<li><strong class="command">ST_StartPoint(geometry)</strong> returns the first coordinate as a point</li>
+<li><strong class="command">ST_EndPoint(geometry)</strong> returns the last coordinate as a point</li>
+<li><strong class="command">ST_NPoints(geometry)</strong> returns the number of coordinates in the linestring</li>
+<li><strong class="command">ST_Area(geometry)</strong> returns the area of the polygons</li>
+<li><strong class="command">ST_NRings(geometry)</strong> returns the number of rings (usually 1, more if there are holes)</li>
+<li><strong class="command">ST_ExteriorRing(polygon)</strong> returns the outer ring as a linestring</li>
+<li><strong class="command">ST_InteriorRingN(polygon, integer)</strong> returns a specified interior ring as a linestring</li>
+<li><strong class="command">ST_Perimeter(geometry)</strong> returns the length of all the rings</li>
+<li><strong class="command">ST_NumGeometries(multi/geomcollection)</strong> returns the number of parts in the collection</li>
+<li><strong class="command">ST_GeometryN(geometry, integer)</strong> returns the specified part of the collection</li>
+<li><strong class="command">ST_GeomFromText(text)</strong> returns <tt class="docutils literal"><span class="pre">geometry</span></tt></li>
+<li><strong class="command">ST_AsText(geometry)</strong> returns WKT <tt class="docutils literal"><span class="pre">text</span></tt></li>
+<li><strong class="command">ST_AsEWKT(geometry)</strong> returns EWKT <tt class="docutils literal"><span class="pre">text</span></tt></li>
+<li><strong class="command">ST_GeomFromWKB(bytea)</strong> returns <tt class="docutils literal"><span class="pre">geometry</span></tt></li>
+<li><strong class="command">ST_AsBinary(geometry)</strong> returns WKB <tt class="docutils literal"><span class="pre">bytea</span></tt></li>
+<li><strong class="command">ST_AsEWKB(geometry)</strong> returns EWKB <tt class="docutils literal"><span class="pre">bytea</span></tt></li>
+<li><strong class="command">ST_GeomFromGML(text)</strong> returns <tt class="docutils literal"><span class="pre">geometry</span></tt></li>
+<li><strong class="command">ST_AsGML(geometry)</strong> returns GML <tt class="docutils literal"><span class="pre">text</span></tt></li>
+<li><strong class="command">ST_GeomFromKML(text)</strong> returns <tt class="docutils literal"><span class="pre">geometry</span></tt></li>
+<li><strong class="command">ST_AsKML(geometry)</strong> returns KML <tt class="docutils literal"><span class="pre">text</span></tt></li>
+<li><strong class="command">ST_AsGeoJSON(geometry)</strong> returns JSON <tt class="docutils literal"><span class="pre">text</span></tt></li>
+<li><strong class="command">ST_AsSVG(geometry)</strong> returns SVG <tt class="docutils literal"><span class="pre">text</span></tt></li>
+</ul>
+<p>Also remember the tables we have available:</p>
+<ul class="simple">
+<li><tt class="docutils literal"><span class="pre">nyc_census_blocks</span></tt><ul>
+<li>blkid, popn_total, boroname, geom</li>
+</ul>
+</li>
+<li><tt class="docutils literal"><span class="pre">nyc_streets</span></tt><ul>
+<li>name, type, geom</li>
+</ul>
+</li>
+<li><tt class="docutils literal"><span class="pre">nyc_subway_stations</span></tt><ul>
+<li>name, geom</li>
+</ul>
+</li>
+<li><tt class="docutils literal"><span class="pre">nyc_neighborhoods</span></tt><ul>
+<li>name, boroname, geom</li>
+</ul>
+</li>
+</ul>
+<div class="section" id="exercises">
+<h2>Exercises<a class="headerlink" href="#exercises" title="Permalink to this headline">¶</a></h2>
+<ul>
+<li><p class="first"><strong>&#8220;What is the area of the &#8216;West Village&#8217; neighborhood?&#8221;</strong></p>
+<div class="highlight-sql"><div class="highlight"><pre><span class="k">SELECT</span> <span class="n">ST_Area</span><span class="p">(</span><span class="n">geom</span><span class="p">)</span>
+  <span class="k">FROM</span> <span class="n">nyc_neighborhoods</span>
+  <span class="k">WHERE</span> <span class="n">name</span> <span class="o">=</span> <span class="s1">&#39;West Village&#39;</span><span class="p">;</span>
+</pre></div>
+</div>
+<div class="highlight-python"><div class="highlight"><pre><span class="mf">1044614.53027344</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">The area is given in square meters. To get an area in hectares, divide by 10000. To get an area in acres, divide by 4047.</p>
+</div>
+</li>
+<li><p class="first"><strong>&#8220;What is the area of Manhattan in acres?&#8221;</strong> (Hint: both <tt class="docutils literal"><span class="pre">nyc_census_blocks</span></tt> and <tt class="docutils literal"><span class="pre">nyc_neighborhoods</span></tt> have a <tt class="docutils literal"><span class="pre">boroname</span></tt> in them.)</p>
+<div class="highlight-sql"><div class="highlight"><pre><span class="k">SELECT</span> <span class="k">Sum</span><span class="p">(</span><span class="n">ST_Area</span><span class="p">(</span><span class="n">geom</span><span class="p">))</span> <span class="o">/</span> <span class="mi">4047</span>
+  <span class="k">FROM</span> <span class="n">nyc_neighborhoods</span>
+  <span class="k">WHERE</span> <span class="n">boroname</span> <span class="o">=</span> <span class="s1">&#39;Manhattan&#39;</span><span class="p">;</span>
+</pre></div>
+</div>
+<div class="highlight-python"><div class="highlight"><pre><span class="mf">13965.3201224118</span>
+</pre></div>
+</div>
+<p>or...</p>
+<div class="highlight-sql"><div class="highlight"><pre><span class="k">SELECT</span> <span class="k">Sum</span><span class="p">(</span><span class="n">ST_Area</span><span class="p">(</span><span class="n">geom</span><span class="p">))</span> <span class="o">/</span> <span class="mi">4047</span>
+  <span class="k">FROM</span> <span class="n">nyc_census_blocks</span>
+  <span class="k">WHERE</span> <span class="n">boroname</span> <span class="o">=</span> <span class="s1">&#39;Manhattan&#39;</span><span class="p">;</span>
+</pre></div>
+</div>
+<div class="highlight-python"><div class="highlight"><pre><span class="mf">14601.3987215548</span>
+</pre></div>
+</div>
+</li>
+<li><p class="first"><strong>&#8220;How many census blocks in New York City have a hole in them?&#8221;</strong></p>
+<div class="highlight-sql"><div class="highlight"><pre><span class="k">SELECT</span> <span class="k">Count</span><span class="p">(</span><span class="o">*</span><span class="p">)</span>
+  <span class="k">FROM</span> <span class="n">nyc_census_blocks</span>
+  <span class="k">WHERE</span> <span class="n">ST_NumInteriorRings</span><span class="p">(</span><span class="n">ST_GeometryN</span><span class="p">(</span><span class="n">geom</span><span class="p">,</span><span class="mi">1</span><span class="p">))</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">;</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">The ST_NRings() functions might be tempting, but it also counts the exterior rings of multi-polygons as well as interior rings.  In order to run ST_NumInteriorRings() we need to convert the MultiPolygon geometries of the blocks into simple polygons, so we extract the first polygon from each collection using ST_GeometryN(). Yuck!</p>
+</div>
+<div class="highlight-python"><div class="highlight"><pre><span class="mi">43</span>
+</pre></div>
+</div>
+</li>
+<li><p class="first"><strong>&#8220;What is the total length of streets (in kilometers) in New York City?&#8221;</strong> (Hint: The units of measurement of the spatial data are meters, there are 1000 meters in a kilometer.)</p>
+<div class="highlight-sql"><div class="highlight"><pre><span class="k">SELECT</span> <span class="k">Sum</span><span class="p">(</span><span class="n">ST_Length</span><span class="p">(</span><span class="n">geom</span><span class="p">))</span> <span class="o">/</span> <span class="mi">1000</span>
+  <span class="k">FROM</span> <span class="n">nyc_streets</span><span class="p">;</span>
+</pre></div>
+</div>
+<div class="highlight-python"><div class="highlight"><pre><span class="mf">10418.9047172</span>
+</pre></div>
+</div>
+</li>
+<li><p class="first"><strong>&#8220;How long is &#8216;Columbus Cir&#8217; (Columbus Circle)?</strong></p>
+<div class="highlight-sql"><div class="highlight"><pre><span class="k">SELECT</span> <span class="n">ST_Length</span><span class="p">(</span><span class="n">geom</span><span class="p">)</span>
+  <span class="k">FROM</span> <span class="n">nyc_streets</span>
+  <span class="k">WHERE</span> <span class="n">name</span> <span class="o">=</span> <span class="s1">&#39;Columbus Cir&#39;</span><span class="p">;</span>
+</pre></div>
+</div>
+<div class="highlight-python"><div class="highlight"><pre><span class="mf">308.34199</span>
+</pre></div>
+</div>
+</li>
+<li><p class="first"><strong>&#8220;What is the JSON representation of the boundary of the &#8216;West Village&#8217;?&#8221;</strong></p>
+<div class="highlight-sql"><div class="highlight"><pre><span class="k">SELECT</span> <span class="n">ST_AsGeoJSON</span><span class="p">(</span><span class="n">geom</span><span class="p">)</span>
+  <span class="k">FROM</span> <span class="n">nyc_neighborhoods</span>
+  <span class="k">WHERE</span> <span class="n">name</span> <span class="o">=</span> <span class="s1">&#39;West Village&#39;</span><span class="p">;</span>
+</pre></div>
+</div>
+<div class="highlight-python"><div class="highlight"><pre><span class="p">{</span><span class="s">&quot;type&quot;</span><span class="p">:</span><span class="s">&quot;MultiPolygon&quot;</span><span class="p">,</span><span class="s">&quot;coordinates&quot;</span><span class="p">:</span>
+ <span class="p">[[[[</span><span class="mf">583263.2776595836</span><span class="p">,</span><span class="mf">4509242.6260239873</span><span class="p">],</span>
+    <span class="p">[</span><span class="mf">583276.81990686338</span><span class="p">,</span><span class="mf">4509378.825446927</span><span class="p">],</span> <span class="o">...</span>
+    <span class="p">[</span><span class="mf">583263.2776595836</span><span class="p">,</span><span class="mf">4509242.6260239873</span><span class="p">]]]]}</span>
+</pre></div>
+</div>
+<p>The geometry type is &#8220;MultiPolygon&#8221;, interesting!</p>
+</li>
+<li><p class="first"><strong>&#8220;How many polygons are in the &#8216;West Village&#8217; multipolygon?&#8221;</strong></p>
+<div class="highlight-sql"><div class="highlight"><pre><span class="k">SELECT</span> <span class="n">ST_NumGeometries</span><span class="p">(</span><span class="n">geom</span><span class="p">)</span>
+  <span class="k">FROM</span> <span class="n">nyc_neighborhoods</span>
+  <span class="k">WHERE</span> <span class="n">name</span> <span class="o">=</span> <span class="s1">&#39;West Village&#39;</span><span class="p">;</span>
+</pre></div>
+</div>
+<div class="highlight-python"><div class="highlight"><pre><span class="mi">1</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">It is not uncommon to find single-element MultiPolygons in spatial tables. Using MultiPolygons allows a table with only one geometry type to store both single- and multi-geometries without using mixed types.</p>
+</div>
+</li>
+<li><p class="first"><strong>&#8220;What is the length of streets in New York City, summarized by type?&#8221;</strong></p>
+<div class="highlight-sql"><div class="highlight"><pre><span class="k">SELECT</span> <span class="k">type</span><span class="p">,</span> <span class="k">Sum</span><span class="p">(</span><span class="n">ST_Length</span><span class="p">(</span><span class="n">geom</span><span class="p">))</span> <span class="k">AS</span> <span class="k">length</span>
+<span class="k">FROM</span> <span class="n">nyc_streets</span>
+<span class="k">GROUP</span> <span class="k">BY</span> <span class="k">type</span>
+<span class="k">ORDER</span> <span class="k">BY</span> <span class="k">length</span> <span class="k">DESC</span><span class="p">;</span>
+</pre></div>
+</div>
+<div class="highlight-python"><pre>                       type                       |      length
+--------------------------------------------------+------------------
+ residential                                      | 8629870.33786606
+ motorway                                         | 403622.478126363
+ tertiary                                         | 360394.879051303
+ motorway_link                                    | 294261.419479668
+ secondary                                        | 276264.303897926
+ unclassified                                     | 166936.371604458
+ primary                                          | 135034.233017947
+ footway                                          | 71798.4878378096
+ service                                          |  28337.635038596
+ trunk                                            | 20353.5819826076
+ cycleway                                         | 8863.75144825929
+ pedestrian                                       | 4867.05032825026
+ construction                                     | 4803.08162103562
+ residential; motorway_link                       | 3661.57506293745
+ trunk_link                                       | 3202.18981240201
+ primary_link                                     | 2492.57457083536
+ living_street                                    | 1894.63905457332
+ primary; residential; motorway_link; residential | 1367.76576941335
+ undefined                                        |  380.53861910346
+ steps                                            | 282.745221342127
+ motorway_link; residential                       |  215.07778911517</pre>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">The <tt class="docutils literal"><span class="pre">ORDER</span> <span class="pre">BY</span> <span class="pre">length</span> <span class="pre">DESC</span></tt> clause sorts the result by length in descending order. The result is that most prevalent types are first in the list.</p>
+</div>
+</li>
+</ul>
+</div>
+</div>
+
+
+      <!-- Next/Prev -->
+      <div class="selfclear pagination-nav">
+          <div class="left"><strong>Previous</strong>: <a href="geometries.html" title="previous chapter">Section 8: Geometries</a></div>
+          <div class="right"><strong>Next</strong>: <a href="spatial_relationships.html" title="next chapter">Section 10: Spatial Relationships</a></div>
+      </div>
+
+  </div> <!-- rightbar_main -->
+
+  <div id="rightbar_bar">
+    
+      <div id="toc" class="section">
+        <h4 class="pngfix">Page Contents</h4>
+        <ul>
+<li><a class="reference internal" href="#">Section 9: Geometry Exercises</a><ul>
+<li><a class="reference internal" href="#exercises">Exercises</a></li>
+</ul>
+</li>
+</ul>
+
+        <div class="section-footer"></div>
+      </div>
+        <div class="section">
+          <h3>Continue Reading</h3>
+          <p style="margin-top:1em"><b>Previous:</b> <a href="geometries.html" title="previous chapter">Section 8: Geometries</a></p>
+          <p><b>Next:</b> <a href="spatial_relationships.html" title="next chapter">Section 10: Spatial Relationships</a></p>
+          </ul>
+        </div>
+
+   <h4>About Boundless</h4>
+   <p>Boundless provides <a href="http://boundlessgeo.com/solutions/">commercial open source software</a> for internet mapping and geospatial application development. We are dedicated to the growth and support of open source software.</p>
+
+    <h4>License</h4>
+    <p>This work is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/3.0/">Creative Commons Non Commercial-Attribution-Share Alike 3.0 United States License</a>.  Feel free to use this material, but we ask that you please retain the Boundless branding, logos and style.</p>
+<p><a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/3.0/"><img alt="Creative Commons License" style="border-width:0" src="http://i.creativecommons.org/l/by-nc-sa/3.0/88x31.png" /></a></p>
+<!--
+<ul id="relatedlinks" class="selfclear">
+  <li class="first">
+    <a href="spatial_relationships.html" title="Section 10: Spatial Relationships"
+       accesskey="N">next</a></li>
+  <li>
+    <a href="geometries.html" title="Section 8: Geometries"
+       accesskey="P">previous</a>|</li>
+</ul> -->
+  </div> <!-- rightbar_bar -->
+
+  </div> <!-- content -->
+  <div id="footer">
+    <footer id="colophon" class="site-footer" role="contentinfo">
+		<div class="container">
+			<div class="row">
+				<div class="span2">
+					<h5>Solutions</h5>
+					<div class="footer-solutions-menu">
+						<ul id="menu-solutions" class="menu">
+							<li><a href="http://boundlessgeo.com/solutions/">Overview</a></li>
+							<li><a href="http://boundlessgeo.com/opengeo-suite/">OpenGeo Suite</a></li>
+							<li><a href="http://boundlessgeo.com/solutions/mapmeter/">MapMeter</a></li>
+							<li><a href="http://boundlessgeo.com/solutions/solutions-software/">Software</a></li>
+							<li><a href="http://boundlessgeo.com/solutions/solutions-industry/">Industries</a></li>
+						</ul>
+					</div>
+				</div>
+				<div class="span2">
+					<h5>Resources</h5>
+					<div class="footer-resources-menu">
+						<ul id="menu-resources" class="menu">
+              <li><a href="http://boundlessgeo.com/resources/">Overview</a></li>
+							<li><a href="http://boundlessgeo.com/documentation/">Documentation</a></li>
+							<li><a href="http://boundlessgeo.com/resources/trainings/">Trainings</a></li>
+							<li><a href="http://workshops.boundlessgeo.com/">Workshops</a></li>
+							<li><a href="http://boundlessgeo.com/case-studies/">Case Studies</a></li>
+							<li><a href="http://boundlessgeo.com/resources/white-papers/">White Papers</a></li>
+						</ul>
+					</div>
+				</div>
+				<div class="span2">
+					<h5>About Us</h5>
+					<div class="footer-about-menu">
+						<ul id="menu-about-menu" class="menu">
+              <li><a href="http://boundlessgeo.com/about/">Overview</a></li>
+							<li><a href="http://boundlessgeo.com/why-boundless/">Why Boundless</a></li>
+							<li><a href="http://boundlessgeo.com/about/team/">Team</a></li>
+							<li><a href="http://boundlessgeo.com/resources/careers/">Careers</a></li>
+							<li><a href="http://boundlessgeo.com/resources/partners/">Partners</a></li>
+							<li><a href="http://boundlessgeo.com/blog/">Blog</a></li>
+							<li><a href="http://boundlessgeo.com/resources/news/">News &amp; Media</a></li>
+              <li><a href="http://boundlessgeo.com/general-information/">Contact</a></li>
+            </ul></div>
+  				</div>
+
+				<div class="span6 site-info">
+
+					<div class="row-fluid">
+						<div class="span6">
+							<h5>Contact</h5>
+							<p class="address">
+								<span>155 Water Street, Suite 4-10</span>
+								<span>Brooklyn, NY 11201</span>
+								<span>1-877-673-6436</span>
+								<span>contact@boundlessgeo.com</span>
+							</p>
+						</div>
+						<div class="span6">
+							<span class="social"><i class="twitter"></i><a href="https://twitter.com/boundlessgeo" target="_blank">Follow us on Twitter</a></span>
+							<span class="social"><i class="linkedIn"></i><a href="http://www.linkedin.com/company/boundlessgeo" target="_blank">Follow us on Linkedin</a></span>
+						</div>
+					</div>
+
+				</div>
+			</div>
+			<div class="row">
+				<div class="span12 footer-sub-menu">
+					<div class="menu-footer-menu-container">
+						<ul id="menu-footer-menu" class="menu">
+							<li><a href="http://boundlessgeo.com/terms-service/">Terms of Service</a></li>
+							<li><a href="http://boundlessgeo.com/privacy-policy/">Privacy Policy</a></li>
+							<li><a href="http://boundlessgeo.com/site-map/">Site Map</a></li>
+							<li><a href="http://boundlessgeo.com/">© Boundless</a></li>
+						</ul>
+					</div>
+				</div>
+			</div>
+		</div>
+		<a class="question btn btn-primary" href="http://boundlessgeo.com/general-information/?contact-variable=ask_a_question"><i class="bubble"></i>Ask A Question</a>
+	</footer>
+  </div><!-- footer -->
+
+</div><!-- container -->
+
+<script type="text/javascript" src="http://boundlessgeo.com/wp-content/themes/open-geo/js/dropdown.js"></script>
+<script type="text/javascript">
+var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+</script>
+<script type="text/javascript">
+try {
+var pageTracker = _gat._getTracker("UA-3879903-6");
+pageTracker._trackPageview();
+} catch(err) {}
+</script>
+
+  </body>
+</html>

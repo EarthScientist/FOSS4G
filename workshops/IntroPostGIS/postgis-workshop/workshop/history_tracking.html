@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html lang="en-US" prefix="og: http://ogp.me/ns#">
+<head>
+  <meta charset="UTF-8">
+  
+  <title>Boundless : Introduction to PostGIS : Section 27: Tracking Edit History using Triggers</title>
+
+  <link rel="profile" href="http://gmpg.org/xfn/11">
+  <link rel="stylesheet" href="http://boundlessgeo.com/wp-content/themes/open-geo/style.css" type="text/css"/>
+
+<link rel="stylesheet" id="style-css" href="http://boundlessgeo.com/wp-content/themes/open-geo/style.css?ver=3.6.1" type="text/css" media="all">
+  <link rel="stylesheet" href="_static/extra.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <!-- <link rel="stylesheet" type="text/css" href="http://opengeo.org/include/superfish/css/superfish.css" media="screen" /> -->
+
+  <script type="text/javascript" src="http://boundlessgeo.com/wordpress/wp-includes/js/jquery/jquery.js?ver=1.10.2"></script>
+  <script type="text/javascript" src="http://boundlessgeo.com/wordpress/wp-includes/js/jquery/jquery-migrate.min.js?ver=1.2.1"></script>
+
+  <script type="text/javascript">
+    var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '1.0',
+        COLLAPSE_MODINDEX: false,
+        FILE_SUFFIX: '.html'
+    };
+  </script>
+  <script type="text/javascript" src="_static/jquery.js"></script>
+  <script type="text/javascript" src="_static/underscore.js"></script>
+  <script type="text/javascript" src="_static/doctools.js"></script>
+  <script type="text/javascript" src="_static/searchtools.js"></script>
+  <script type="text/javascript" src="searchindex.js"></script>
+  <!-- 
+  <script type="text/javascript" src="http://opengeo.org/include/superfish/js/jquery-1.2.6.min.js"></script> 
+  <script type="text/javascript" src="http://opengeo.org/include/superfish/js/hoverIntent.js"></script>
+  <script type="text/javascript" src="http://opengeo.org/include/superfish/js/superfish.js"></script>
+  <script type="text/javascript" src="http://opengeo.org/include/superfish/js/supersubs.js"></script>
+  <script>
+	$(document).ready(function(){
+		$("ul.sf-menu").supersubs({
+		}).superfish();  // call supersubs first, then superfish, so that subs are
+						 // not display:none when measuring. Call before initialising
+						 // containing tabs for same reason.
+	});
+	</script>
+  -->
+  <link rel="shortcut icon" href="_static/favicon.ico"/>
+      <link rel="top" title="Introduction to PostGIS" href="index.html" />
+      <link rel="next" title="Section 28: Advanced Geometry Constructions" href="advanced_geometry_construction.html" />
+      <link rel="prev" title="Section 26: Nearest-Neighbour Searching" href="knn.html" />
+
+<script type="text/javascript" src="//use.typekit.net/ijz1lwt.js"></script>
+<script type="text/javascript">try{Typekit.load();}catch(e){}</script>
+
+<!--[if lt IE 9]>
+<script src="http://boundlessgeo.com/wp-content/themes/open-geo/js/html5.js" type="text/javascript"></script>
+<![endif]-->
+
+
+</head>
+<body class="page">
+
+	<div id="wrapper">
+		<header id="masthead" class="site-header" role="banner">
+			<div class="container">
+				<a href="http://boundlessgeo.com/" rel="home" id="logo"><img src="http://boundlessgeo.com/wp-content/themes/open-geo/images/logo.png"></a>
+
+				<div class="pull-right">
+					<div class="pull-left">
+						<div class="menu-main-container">
+							<ul id="menu-main" class="menu">
+                <li class="solutions-primary menu-item menu-item-type-post_type menu-item-object-page menu-item-22"><a href="http://boundlessgeo.com/solutions/">Solutions</a></li>
+                <li class="resources-primary menu-item menu-item-type-post_type menu-item-object-page current-menu-item page_item page-item-16 current_page_item menu-item-23"><a href="http://boundlessgeo.com/resources/">Resources</a></li>
+                <li class="about-primary menu-item menu-item-type-post_type menu-item-object-page menu-item-24"><a href="http://boundlessgeo.com/about/">About</a></li>
+                <li class="support-primary menu-item menu-item-type-post_type menu-item-object-page menu-item-25"><a href="http://boundlessgeo.com/support/">Support</a></li>
+							</ul>
+						</div>
+					</div>
+					<div class="search dropdown">
+					  <a class="dropdown-toggle" data-toggle="dropdown" href="#"><i class="search-icon"></i></a>
+						  <div class="dropdown-menu" role="menu" aria-labelledby="dLabel">
+							  <form method="get" id="searchform" class="searchform" action="http://boundlessgeo.com/" role="search">
+								  <label for="s" class="screen-reader-text">Search</label>
+							  <input type="search" class="field" name="s" value="" id="s" placeholder="Search …">
+							  <input type="submit" class="submit" id="searchsubmit" value="Search">
+							  </form>
+						  </div>
+					</div>
+					<div class="download-link">
+						<ul id="menu-download-link" class="menu">
+							<li id="menu-item-5817" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-5817">
+								<a href="http://boundlessgeo.com/download/">Download</a>
+							</li>
+						</ul>
+					</div>
+				</div>
+
+			</div><!--closes container-->
+
+		</header>
+<section class="resources page-resources">
+  <div class="secondarynav">
+     <div class="container">
+       	<div class="menu-resources-container">
+	   <ul id="menu-resources" class="menu">
+              <li id="menu-item-5892" class="menu-item menu-item-type-post_type menu-item-object-page current-menu-item page_item page-item-16 current_page_item menu-item-5892"><a href="http://boundlessgeo.com/resources/" >Overview</a></li>
+              <li id="menu-item-7099" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-7099"><a href="http://boundlessgeo.com/resources/documentation/" >Documentation</a></li>
+              <li id="menu-item-5885" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-5885"><a href="http://boundlessgeo.com/resources/trainings/" >Trainings</a></li>
+              <li id="menu-item-6432" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-6432"><a href="http://workshops.boundlessgeo.com/" >Workshops</a></li>
+              <li id="menu-item-5318" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-5318"><a href="http://boundlessgeo.com/resources/case-studies/" >Case Studies</a></li>
+              <li id="menu-item-5891" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-5891"><a href="http://boundlessgeo.com/resources/white-papers/" >White Papers</a></li>
+           </ul>
+         </div>		
+      </div>
+    </div>
+</section>
+<header class="page-header">
+	<div class="container">
+		<h1 class="page-title"><a href="index.html">Introduction to PostGIS</a></h1>
+		<p>PostGIS extends PostgreSQL with robust spatial database management capabilities. <a href="http://boundlessgeo.com/solutions/solutions-software/postgis/">More info</a></p>
+	</div>
+</header><div id="pageheading"><div class="contents"><h1>Introduction to PostGIS</h1></div></div>
+
+  <div id="content" class="contents">
+  <!--
+<div id="breadcrumbs">
+  <a href="http://boundlessgeo.com/">Home</a> &raquo;
+  <a href="http://boundlessgeo.com/resources/">Resources</a> &raquo;
+  <a href="http://workshops.boundlessgeo.com/">Workshops</a> &raquo;
+  <a href="index.html">Introduction to PostGIS</a>
+  
+     &raquo; <a href="">Section 27: Tracking Edit History using Triggers</a>
+</div> -->
+
+  <div id="rightbar_main">
+      
+  <div class="section" id="section-27-tracking-edit-history-using-triggers">
+<span id="history-tracking"></span><h1>Section 27: Tracking Edit History using Triggers<a class="headerlink" href="#section-27-tracking-edit-history-using-triggers" title="Permalink to this headline">¶</a></h1>
+<p>A common requirement for production databases is the ability to track history: how has the data changed between two dates, who made the changes, and where did they occur? Some GIS systems track changes by including change management in the client interface, but that adds a lot of complexity to editing tools.</p>
+<p>Using the database and the trigger system, it&#8217;s possible to add history tracking to any table, while maintaining simple &#8220;direct edit&#8221; access to the primary table.</p>
+<p>History tracking works by keeping a history table that records, for every edit:</p>
+<ul class="simple">
+<li>If a record was created, when it was added and by whom.</li>
+<li>If a record was deleted, when it was deleted and by whom.</li>
+<li>If a record was updated, adding a deletion record (for the old state) and a creation record (for the new state).</li>
+</ul>
+<div class="section" id="building-the-history-table">
+<h2>Building the History Table<a class="headerlink" href="#building-the-history-table" title="Permalink to this headline">¶</a></h2>
+<p>Using this information it is possible to reconstruct the state of the edit table at any point in time. In this example, we will add history tracking to our <strong>nyc_streets</strong> table.</p>
+<ul>
+<li><p class="first">First, add a new <strong>nyc_streets_history</strong> table. This is the table we will use to store all the historical edit information. In addition to all the fields from <strong>nyc_streets</strong>, we add five more fields.</p>
+<ul class="simple">
+<li><strong>hid</strong> the primary key for the history table</li>
+<li><strong>created</strong> the date/time the history record was created</li>
+<li><strong>created_by</strong> the database user that caused the record to be created</li>
+<li><strong>deleted</strong> the date/time the history record was marked as deleted</li>
+<li><strong>deleted_by</strong> the database user that caused the record to be marked as deleted</li>
+</ul>
+<p>Note that we don&#8217;t actually delete any records in the history table, we just mark the time they ceased to be part of the current state of the edit table.</p>
+<div class="highlight-sql"><div class="highlight"><pre><span class="k">CREATE</span> <span class="k">TABLE</span> <span class="n">nyc_streets_history</span> <span class="p">(</span>
+  <span class="n">hid</span> <span class="nb">SERIAL</span> <span class="k">PRIMARY</span> <span class="k">KEY</span><span class="p">,</span>
+  <span class="n">gid</span> <span class="nb">INTEGER</span><span class="p">,</span>
+  <span class="n">id</span> <span class="n">FLOAT8</span><span class="p">,</span>
+  <span class="n">name</span> <span class="nb">VARCHAR</span><span class="p">(</span><span class="mi">200</span><span class="p">),</span>
+  <span class="n">oneway</span> <span class="nb">VARCHAR</span><span class="p">(</span><span class="mi">10</span><span class="p">),</span>
+  <span class="k">type</span> <span class="nb">VARCHAR</span><span class="p">(</span><span class="mi">50</span><span class="p">),</span>
+  <span class="n">geom</span> <span class="n">GEOMETRY</span><span class="p">(</span><span class="n">MultiLinestring</span><span class="p">,</span><span class="mi">26918</span><span class="p">),</span>
+  <span class="n">created</span> <span class="k">TIMESTAMP</span><span class="p">,</span>
+  <span class="n">created_by</span> <span class="nb">VARCHAR</span><span class="p">(</span><span class="mi">32</span><span class="p">),</span>
+  <span class="n">deleted</span> <span class="k">TIMESTAMP</span><span class="p">,</span>
+  <span class="n">deleted_by</span> <span class="nb">VARCHAR</span><span class="p">(</span><span class="mi">32</span><span class="p">)</span>
+<span class="p">);</span>
+</pre></div>
+</div>
+</li>
+<li><p class="first">Next, we import the current state of the active table, <strong>nyc_streets</strong> into the history table, so we have a starting point to trace history from. Note that we fill in the creation time and creation user, but leave the deletion records NULL.</p>
+<div class="highlight-sql"><div class="highlight"><pre><span class="k">INSERT</span> <span class="k">INTO</span> <span class="n">nyc_streets_history</span>
+  <span class="p">(</span><span class="n">gid</span><span class="p">,</span> <span class="n">id</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">oneway</span><span class="p">,</span> <span class="k">type</span><span class="p">,</span> <span class="n">geom</span><span class="p">,</span> <span class="n">created</span><span class="p">,</span> <span class="n">created_by</span><span class="p">)</span>
+   <span class="k">SELECT</span> <span class="n">gid</span><span class="p">,</span> <span class="n">id</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">oneway</span><span class="p">,</span> <span class="k">type</span><span class="p">,</span> <span class="n">geom</span><span class="p">,</span> <span class="n">now</span><span class="p">(),</span> <span class="k">current_user</span>
+   <span class="k">FROM</span> <span class="n">nyc_streets</span><span class="p">;</span>
+</pre></div>
+</div>
+</li>
+<li><p class="first">Now we need three triggers on the active table, for INSERT, DELETE and UPDATE actions. First we create the trigger functions, then bind them to the table as triggers.</p>
+<p>For an insert, we just add a new record into the history table with the creation time/user.</p>
+<div class="highlight-sql"><pre>CREATE OR REPLACE FUNCTION nyc_streets_insert() RETURNS trigger AS
+$$
+  BEGIN
+    INSERT INTO nyc_streets_history
+      (gid, id, name, oneway, type, geom, created, created_by)
+    VALUES
+      (NEW.gid, NEW.id, NEW.name, NEW.oneway, NEW.type, NEW.geom,
+       current_timestamp, current_user);
+    RETURN NEW;
+  END;
+$$
+LANGUAGE plpgsql;
+
+CREATE TRIGGER nyc_streets_insert_trigger
+AFTER INSERT ON nyc_streets
+  FOR EACH ROW EXECUTE PROCEDURE nyc_streets_insert();</pre>
+</div>
+<p>For a deletion, we just mark the currently active history record (the one with a NULL deletion time) as deleted.</p>
+<div class="highlight-sql"><pre>CREATE OR REPLACE FUNCTION nyc_streets_delete() RETURNS trigger AS
+$$
+  BEGIN
+    UPDATE nyc_streets_history
+      SET deleted = current_timestamp, deleted_by = current_user
+      WHERE deleted IS NULL and gid = OLD.gid;
+    RETURN NULL;
+  END;
+$$
+LANGUAGE plpgsql;
+
+CREATE TRIGGER nyc_streets_delete_trigger
+AFTER DELETE ON nyc_streets
+  FOR EACH ROW EXECUTE PROCEDURE nyc_streets_delete();</pre>
+</div>
+<p>For an update, we first mark the active history record as deleted, then insert a new record for the updated state.</p>
+<div class="highlight-sql"><pre>CREATE OR REPLACE FUNCTION nyc_streets_update() RETURNS trigger AS
+$$
+  BEGIN
+
+    UPDATE nyc_streets_history
+      SET deleted = current_timestamp, deleted_by = current_user
+      WHERE deleted IS NULL and gid = OLD.gid;
+
+    INSERT INTO nyc_streets_history
+      (gid, id, name, oneway, type, geom, created, created_by)
+    VALUES
+      (NEW.gid, NEW.id, NEW.name, NEW.oneway, NEW.type, NEW.geom,
+       current_timestamp, current_user);
+
+    RETURN NEW;
+
+  END;
+$$
+LANGUAGE plpgsql;
+
+CREATE TRIGGER nyc_streets_update_trigger
+AFTER UPDATE ON nyc_streets
+  FOR EACH ROW EXECUTE PROCEDURE nyc_streets_update();</pre>
+</div>
+</li>
+</ul>
+</div>
+<div class="section" id="editing-the-table">
+<h2>Editing the Table<a class="headerlink" href="#editing-the-table" title="Permalink to this headline">¶</a></h2>
+<p>Now that the history table is enabled, we can make edits on the main table and watch the log entries appear in the history table.</p>
+<p>Note the power of this database-backed approach to history: <strong>no matter what tool is used to make the edits, whether the SQL command line, a web-based JDBC tool, or a desktop tool like QGIS, the history is consistently tracked.</strong></p>
+<div class="section" id="sql-edits">
+<h3>SQL Edits<a class="headerlink" href="#sql-edits" title="Permalink to this headline">¶</a></h3>
+<p>Let&#8217;s turn the two streets named &#8220;Cumberland Walk&#8221; to the more stylish &#8220;Cumberland Wynde&#8221;:</p>
+<p>Updating the two streets will cause the original streets to be marked as deleted in the history table, with a deletion time of now, and two new streets with the new name added, with an addition time of now. You can inspect the historical records:</p>
+</div>
+</div>
+<div class="section" id="querying-the-history-table">
+<h2>Querying the History Table<a class="headerlink" href="#querying-the-history-table" title="Permalink to this headline">¶</a></h2>
+<p>Now that we have a history table, what use is it? It&#8217;s useful for time travel! To travel to a particular time <strong>T</strong>, you need to construct a query that includes:</p>
+<ul class="simple">
+<li>All records created before T, and not yet deleted; and also</li>
+<li>All records created before T, but deleted <strong>after</strong> T.</li>
+</ul>
+<p>We can use this logic to create a query, or a view, of the state of the data in the past. Since presumably all your test edits have happened in the past couple minutes, let&#8217;s create a view of the history table that shows the state of the table 10 minutes ago, <strong>before you started editing</strong> (so, the original data).</p>
+<div class="highlight-sql"><div class="highlight"><pre><span class="c1">-- State of history 10 minutes ago</span>
+<span class="c1">-- Records must have been created at least 10 minute ago and</span>
+<span class="c1">-- either be visible now (deleted is null) or deleted in the last hour</span>
+
+<span class="k">CREATE</span> <span class="k">OR</span> <span class="k">REPLACE</span> <span class="k">VIEW</span> <span class="n">nyc_streets_ten_min_ago</span> <span class="k">AS</span>
+  <span class="k">SELECT</span> <span class="o">*</span> <span class="k">FROM</span> <span class="n">nyc_streets_history</span>
+    <span class="k">WHERE</span> <span class="n">created</span> <span class="o">&lt;</span> <span class="p">(</span><span class="n">now</span><span class="p">()</span> <span class="o">-</span> <span class="s1">&#39;10min&#39;</span><span class="p">::</span><span class="nb">interval</span><span class="p">)</span>
+    <span class="k">AND</span> <span class="p">(</span> <span class="n">deleted</span> <span class="k">IS</span> <span class="k">NULL</span> <span class="k">OR</span> <span class="n">deleted</span> <span class="o">&gt;</span> <span class="p">(</span><span class="n">now</span><span class="p">()</span> <span class="o">-</span> <span class="s1">&#39;10min&#39;</span><span class="p">::</span><span class="nb">interval</span><span class="p">)</span> <span class="p">);</span>
+</pre></div>
+</div>
+<p>We can also create views that show just what a particular used has added, for example:</p>
+<div class="highlight-sql"><div class="highlight"><pre><span class="k">CREATE</span> <span class="k">OR</span> <span class="k">REPLACE</span> <span class="k">VIEW</span> <span class="n">nyc_streets_postgres</span> <span class="k">AS</span>
+  <span class="k">SELECT</span> <span class="o">*</span> <span class="k">FROM</span> <span class="n">nyc_streets_history</span>
+    <span class="k">WHERE</span> <span class="n">created_by</span> <span class="o">=</span> <span class="s1">&#39;postgres&#39;</span><span class="p">;</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="see-also">
+<h2>See Also<a class="headerlink" href="#see-also" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><a class="reference external" href="http://qgis.org">QGIS open source GIS</a></li>
+<li><a class="reference external" href="http://www.postgresql.org/docs/current/static/plpgsql-trigger.html">PostgreSQL Triggers</a></li>
+</ul>
+</div>
+</div>
+
+
+      <!-- Next/Prev -->
+      <div class="selfclear pagination-nav">
+          <div class="left"><strong>Previous</strong>: <a href="knn.html" title="previous chapter">Section 26: Nearest-Neighbour Searching</a></div>
+          <div class="right"><strong>Next</strong>: <a href="advanced_geometry_construction.html" title="next chapter">Section 28: Advanced Geometry Constructions</a></div>
+      </div>
+
+  </div> <!-- rightbar_main -->
+
+  <div id="rightbar_bar">
+    
+      <div id="toc" class="section">
+        <h4 class="pngfix">Page Contents</h4>
+        <ul>
+<li><a class="reference internal" href="#">Section 27: Tracking Edit History using Triggers</a><ul>
+<li><a class="reference internal" href="#building-the-history-table">Building the History Table</a></li>
+<li><a class="reference internal" href="#editing-the-table">Editing the Table</a><ul>
+<li><a class="reference internal" href="#sql-edits">SQL Edits</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#querying-the-history-table">Querying the History Table</a></li>
+<li><a class="reference internal" href="#see-also">See Also</a></li>
+</ul>
+</li>
+</ul>
+
+        <div class="section-footer"></div>
+      </div>
+        <div class="section">
+          <h3>Continue Reading</h3>
+          <p style="margin-top:1em"><b>Previous:</b> <a href="knn.html" title="previous chapter">Section 26: Nearest-Neighbour Searching</a></p>
+          <p><b>Next:</b> <a href="advanced_geometry_construction.html" title="next chapter">Section 28: Advanced Geometry Constructions</a></p>
+          </ul>
+        </div>
+
+   <h4>About Boundless</h4>
+   <p>Boundless provides <a href="http://boundlessgeo.com/solutions/">commercial open source software</a> for internet mapping and geospatial application development. We are dedicated to the growth and support of open source software.</p>
+
+    <h4>License</h4>
+    <p>This work is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/3.0/">Creative Commons Non Commercial-Attribution-Share Alike 3.0 United States License</a>.  Feel free to use this material, but we ask that you please retain the Boundless branding, logos and style.</p>
+<p><a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/3.0/"><img alt="Creative Commons License" style="border-width:0" src="http://i.creativecommons.org/l/by-nc-sa/3.0/88x31.png" /></a></p>
+<!--
+<ul id="relatedlinks" class="selfclear">
+  <li class="first">
+    <a href="advanced_geometry_construction.html" title="Section 28: Advanced Geometry Constructions"
+       accesskey="N">next</a></li>
+  <li>
+    <a href="knn.html" title="Section 26: Nearest-Neighbour Searching"
+       accesskey="P">previous</a>|</li>
+</ul> -->
+  </div> <!-- rightbar_bar -->
+
+  </div> <!-- content -->
+  <div id="footer">
+    <footer id="colophon" class="site-footer" role="contentinfo">
+		<div class="container">
+			<div class="row">
+				<div class="span2">
+					<h5>Solutions</h5>
+					<div class="footer-solutions-menu">
+						<ul id="menu-solutions" class="menu">
+							<li><a href="http://boundlessgeo.com/solutions/">Overview</a></li>
+							<li><a href="http://boundlessgeo.com/opengeo-suite/">OpenGeo Suite</a></li>
+							<li><a href="http://boundlessgeo.com/solutions/mapmeter/">MapMeter</a></li>
+							<li><a href="http://boundlessgeo.com/solutions/solutions-software/">Software</a></li>
+							<li><a href="http://boundlessgeo.com/solutions/solutions-industry/">Industries</a></li>
+						</ul>
+					</div>
+				</div>
+				<div class="span2">
+					<h5>Resources</h5>
+					<div class="footer-resources-menu">
+						<ul id="menu-resources" class="menu">
+              <li><a href="http://boundlessgeo.com/resources/">Overview</a></li>
+							<li><a href="http://boundlessgeo.com/documentation/">Documentation</a></li>
+							<li><a href="http://boundlessgeo.com/resources/trainings/">Trainings</a></li>
+							<li><a href="http://workshops.boundlessgeo.com/">Workshops</a></li>
+							<li><a href="http://boundlessgeo.com/case-studies/">Case Studies</a></li>
+							<li><a href="http://boundlessgeo.com/resources/white-papers/">White Papers</a></li>
+						</ul>
+					</div>
+				</div>
+				<div class="span2">
+					<h5>About Us</h5>
+					<div class="footer-about-menu">
+						<ul id="menu-about-menu" class="menu">
+              <li><a href="http://boundlessgeo.com/about/">Overview</a></li>
+							<li><a href="http://boundlessgeo.com/why-boundless/">Why Boundless</a></li>
+							<li><a href="http://boundlessgeo.com/about/team/">Team</a></li>
+							<li><a href="http://boundlessgeo.com/resources/careers/">Careers</a></li>
+							<li><a href="http://boundlessgeo.com/resources/partners/">Partners</a></li>
+							<li><a href="http://boundlessgeo.com/blog/">Blog</a></li>
+							<li><a href="http://boundlessgeo.com/resources/news/">News &amp; Media</a></li>
+              <li><a href="http://boundlessgeo.com/general-information/">Contact</a></li>
+            </ul></div>
+  				</div>
+
+				<div class="span6 site-info">
+
+					<div class="row-fluid">
+						<div class="span6">
+							<h5>Contact</h5>
+							<p class="address">
+								<span>155 Water Street, Suite 4-10</span>
+								<span>Brooklyn, NY 11201</span>
+								<span>1-877-673-6436</span>
+								<span>contact@boundlessgeo.com</span>
+							</p>
+						</div>
+						<div class="span6">
+							<span class="social"><i class="twitter"></i><a href="https://twitter.com/boundlessgeo" target="_blank">Follow us on Twitter</a></span>
+							<span class="social"><i class="linkedIn"></i><a href="http://www.linkedin.com/company/boundlessgeo" target="_blank">Follow us on Linkedin</a></span>
+						</div>
+					</div>
+
+				</div>
+			</div>
+			<div class="row">
+				<div class="span12 footer-sub-menu">
+					<div class="menu-footer-menu-container">
+						<ul id="menu-footer-menu" class="menu">
+							<li><a href="http://boundlessgeo.com/terms-service/">Terms of Service</a></li>
+							<li><a href="http://boundlessgeo.com/privacy-policy/">Privacy Policy</a></li>
+							<li><a href="http://boundlessgeo.com/site-map/">Site Map</a></li>
+							<li><a href="http://boundlessgeo.com/">© Boundless</a></li>
+						</ul>
+					</div>
+				</div>
+			</div>
+		</div>
+		<a class="question btn btn-primary" href="http://boundlessgeo.com/general-information/?contact-variable=ask_a_question"><i class="bubble"></i>Ask A Question</a>
+	</footer>
+  </div><!-- footer -->
+
+</div><!-- container -->
+
+<script type="text/javascript" src="http://boundlessgeo.com/wp-content/themes/open-geo/js/dropdown.js"></script>
+<script type="text/javascript">
+var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+</script>
+<script type="text/javascript">
+try {
+var pageTracker = _gat._getTracker("UA-3879903-6");
+pageTracker._trackPageview();
+} catch(err) {}
+</script>
+
+  </body>
+</html>

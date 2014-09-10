@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html lang="en-US" prefix="og: http://ogp.me/ns#">
+<head>
+  <meta charset="UTF-8">
+  
+  <title>Boundless : Introduction to PostGIS : Section 1: Introduction</title>
+
+  <link rel="profile" href="http://gmpg.org/xfn/11">
+  <link rel="stylesheet" href="http://boundlessgeo.com/wp-content/themes/open-geo/style.css" type="text/css"/>
+
+<link rel="stylesheet" id="style-css" href="http://boundlessgeo.com/wp-content/themes/open-geo/style.css?ver=3.6.1" type="text/css" media="all">
+  <link rel="stylesheet" href="_static/extra.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <!-- <link rel="stylesheet" type="text/css" href="http://opengeo.org/include/superfish/css/superfish.css" media="screen" /> -->
+
+  <script type="text/javascript" src="http://boundlessgeo.com/wordpress/wp-includes/js/jquery/jquery.js?ver=1.10.2"></script>
+  <script type="text/javascript" src="http://boundlessgeo.com/wordpress/wp-includes/js/jquery/jquery-migrate.min.js?ver=1.2.1"></script>
+
+  <script type="text/javascript">
+    var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '1.0',
+        COLLAPSE_MODINDEX: false,
+        FILE_SUFFIX: '.html'
+    };
+  </script>
+  <script type="text/javascript" src="_static/jquery.js"></script>
+  <script type="text/javascript" src="_static/underscore.js"></script>
+  <script type="text/javascript" src="_static/doctools.js"></script>
+  <script type="text/javascript" src="_static/searchtools.js"></script>
+  <script type="text/javascript" src="searchindex.js"></script>
+  <!-- 
+  <script type="text/javascript" src="http://opengeo.org/include/superfish/js/jquery-1.2.6.min.js"></script> 
+  <script type="text/javascript" src="http://opengeo.org/include/superfish/js/hoverIntent.js"></script>
+  <script type="text/javascript" src="http://opengeo.org/include/superfish/js/superfish.js"></script>
+  <script type="text/javascript" src="http://opengeo.org/include/superfish/js/supersubs.js"></script>
+  <script>
+	$(document).ready(function(){
+		$("ul.sf-menu").supersubs({
+		}).superfish();  // call supersubs first, then superfish, so that subs are
+						 // not display:none when measuring. Call before initialising
+						 // containing tabs for same reason.
+	});
+	</script>
+  -->
+  <link rel="shortcut icon" href="_static/favicon.ico"/>
+      <link rel="top" title="Introduction to PostGIS" href="index.html" />
+      <link rel="next" title="Section 2: Installation" href="installation.html" />
+      <link rel="prev" title="Welcome" href="welcome.html" />
+
+<script type="text/javascript" src="//use.typekit.net/ijz1lwt.js"></script>
+<script type="text/javascript">try{Typekit.load();}catch(e){}</script>
+
+<!--[if lt IE 9]>
+<script src="http://boundlessgeo.com/wp-content/themes/open-geo/js/html5.js" type="text/javascript"></script>
+<![endif]-->
+
+
+</head>
+<body class="page">
+
+	<div id="wrapper">
+		<header id="masthead" class="site-header" role="banner">
+			<div class="container">
+				<a href="http://boundlessgeo.com/" rel="home" id="logo"><img src="http://boundlessgeo.com/wp-content/themes/open-geo/images/logo.png"></a>
+
+				<div class="pull-right">
+					<div class="pull-left">
+						<div class="menu-main-container">
+							<ul id="menu-main" class="menu">
+                <li class="solutions-primary menu-item menu-item-type-post_type menu-item-object-page menu-item-22"><a href="http://boundlessgeo.com/solutions/">Solutions</a></li>
+                <li class="resources-primary menu-item menu-item-type-post_type menu-item-object-page current-menu-item page_item page-item-16 current_page_item menu-item-23"><a href="http://boundlessgeo.com/resources/">Resources</a></li>
+                <li class="about-primary menu-item menu-item-type-post_type menu-item-object-page menu-item-24"><a href="http://boundlessgeo.com/about/">About</a></li>
+                <li class="support-primary menu-item menu-item-type-post_type menu-item-object-page menu-item-25"><a href="http://boundlessgeo.com/support/">Support</a></li>
+							</ul>
+						</div>
+					</div>
+					<div class="search dropdown">
+					  <a class="dropdown-toggle" data-toggle="dropdown" href="#"><i class="search-icon"></i></a>
+						  <div class="dropdown-menu" role="menu" aria-labelledby="dLabel">
+							  <form method="get" id="searchform" class="searchform" action="http://boundlessgeo.com/" role="search">
+								  <label for="s" class="screen-reader-text">Search</label>
+							  <input type="search" class="field" name="s" value="" id="s" placeholder="Search …">
+							  <input type="submit" class="submit" id="searchsubmit" value="Search">
+							  </form>
+						  </div>
+					</div>
+					<div class="download-link">
+						<ul id="menu-download-link" class="menu">
+							<li id="menu-item-5817" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-5817">
+								<a href="http://boundlessgeo.com/download/">Download</a>
+							</li>
+						</ul>
+					</div>
+				</div>
+
+			</div><!--closes container-->
+
+		</header>
+<section class="resources page-resources">
+  <div class="secondarynav">
+     <div class="container">
+       	<div class="menu-resources-container">
+	   <ul id="menu-resources" class="menu">
+              <li id="menu-item-5892" class="menu-item menu-item-type-post_type menu-item-object-page current-menu-item page_item page-item-16 current_page_item menu-item-5892"><a href="http://boundlessgeo.com/resources/" >Overview</a></li>
+              <li id="menu-item-7099" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-7099"><a href="http://boundlessgeo.com/resources/documentation/" >Documentation</a></li>
+              <li id="menu-item-5885" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-5885"><a href="http://boundlessgeo.com/resources/trainings/" >Trainings</a></li>
+              <li id="menu-item-6432" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-6432"><a href="http://workshops.boundlessgeo.com/" >Workshops</a></li>
+              <li id="menu-item-5318" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-5318"><a href="http://boundlessgeo.com/resources/case-studies/" >Case Studies</a></li>
+              <li id="menu-item-5891" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-5891"><a href="http://boundlessgeo.com/resources/white-papers/" >White Papers</a></li>
+           </ul>
+         </div>		
+      </div>
+    </div>
+</section>
+<header class="page-header">
+	<div class="container">
+		<h1 class="page-title"><a href="index.html">Introduction to PostGIS</a></h1>
+		<p>PostGIS extends PostgreSQL with robust spatial database management capabilities. <a href="http://boundlessgeo.com/solutions/solutions-software/postgis/">More info</a></p>
+	</div>
+</header><div id="pageheading"><div class="contents"><h1>Introduction to PostGIS</h1></div></div>
+
+  <div id="content" class="contents">
+  <!--
+<div id="breadcrumbs">
+  <a href="http://boundlessgeo.com/">Home</a> &raquo;
+  <a href="http://boundlessgeo.com/resources/">Resources</a> &raquo;
+  <a href="http://workshops.boundlessgeo.com/">Workshops</a> &raquo;
+  <a href="index.html">Introduction to PostGIS</a>
+  
+     &raquo; <a href="">Section 1: Introduction</a>
+</div> -->
+
+  <div id="rightbar_main">
+      
+  <div class="section" id="section-1-introduction">
+<span id="introduction"></span><h1>Section 1: Introduction<a class="headerlink" href="#section-1-introduction" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="what-is-a-spatial-database">
+<h2>What is a Spatial Database?<a class="headerlink" href="#what-is-a-spatial-database" title="Permalink to this headline">¶</a></h2>
+<p>PostGIS is a spatial database. Oracle Spatial and SQL Server 2008 are also spatial databases. But what does that mean; what is it that makes an ordinary database a spatial database?</p>
+<p>The short answer, is. . .</p>
+<p><strong>Spatial databases store and manipulate spatial objects like any other object in the database.</strong></p>
+<p>The following briefly covers the evolution of spatial databases, and then reviews three aspects that associate <em>spatial</em> data with a database &#8211; data types, indexes, and functions.</p>
+<ol class="arabic simple">
+<li><strong>Spatial data types</strong> refer to shapes such as point, line, and polygon;</li>
+<li>Multi-dimensional <strong>spatial indexing</strong> is used for efficient processing of spatial operations;</li>
+<li><strong>Spatial functions</strong>, posed in <a class="reference internal" href="glossary.html#term-sql"><em class="xref std std-term">SQL</em></a>, are for querying of spatial properties and relationships.</li>
+</ol>
+<p>Combined, spatial data types, indexes, and functions provide a flexible structure for optimized performance and analysis.</p>
+<div class="section" id="in-the-beginning">
+<h3>In the Beginning<a class="headerlink" href="#in-the-beginning" title="Permalink to this headline">¶</a></h3>
+<p>In legacy first-generation <a class="reference internal" href="glossary.html#term-gis"><em class="xref std std-term">GIS</em></a> implementations, all spatial data is stored in flat files and special <a class="reference internal" href="glossary.html#term-gis"><em class="xref std std-term">GIS</em></a> software is required to interpret and manipulate the data.  These first-generation management systems are designed to meet the needs of users where all required data is within the user&#8217;s organizational domain.  They are proprietary, self-contained systems specifically built for handling spatial data.</p>
+<p>Second-generation spatial systems store some data in relational databases (usually the &#8220;attribute&#8221; or non-spatial parts) but still lack the flexibility afforded with direct integration.</p>
+<p><strong>True spatial databases were born when people started to treat spatial features as first class database objects.</strong></p>
+<p>Spatial databases fully integrate spatial data with an object relational database.  The orientation changes from GIS-centric to database-centric.</p>
+<img alt="_images/beginning.png" class="inline" src="_images/beginning.png" />
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">A spatial database management system may be used in applications besides the geographic world.  Spatial databases are used to manage data related to the anatomy of the human body, large-scale integrated circuits, molecular structures, and electro-magnetic fields, among others.</p>
+</div>
+</div>
+<div class="section" id="spatial-data-types">
+<h3>Spatial Data Types<a class="headerlink" href="#spatial-data-types" title="Permalink to this headline">¶</a></h3>
+<p>An ordinary database has strings, numbers, and dates. A spatial database adds additional (spatial) types for representing <strong>geographic features</strong>. These spatial data types abstract and encapsulate spatial structures such as boundary and dimension. In many respects, spatial data types can be understood simply as shapes.</p>
+<img alt="_images/hierarchy.png" class="inline align-center" src="_images/hierarchy.png" />
+<p>Spatial data types are organized in a type hierarchy.  Each sub-type inherits the structure (attributes) and the behavior (methods or functions) of its super-type.</p>
+</div>
+<div class="section" id="spatial-indexes-and-bounding-boxes">
+<h3>Spatial Indexes and Bounding Boxes<a class="headerlink" href="#spatial-indexes-and-bounding-boxes" title="Permalink to this headline">¶</a></h3>
+<p>An ordinary database provides &#8220;access methods&#8221; &#8211; commonly known as <strong>indexes</strong> &#8211; to allow for fast and random access to subsets of data.  Indexing for standard types (numbers, strings, dates) is usually done with <a class="reference external" href="http://en.wikipedia.org/wiki/B-tree">B-tree</a> indexes.  A B-tree partitions the data using the natural sort order to put the data into a hierarchical tree.</p>
+<p>The natural sort order of numbers, strings, and dates is simple to determine &#8211; every value is less than, greater than or equal to every other value. But because polygons can overlap, can be contained in one another, and are arrayed in a two-dimensional (or more) space, a B-tree cannot be used to efficiently index them. Real spatial databases provide a &#8220;spatial index&#8221; that instead answers the question &#8220;which objects are within this particular bounding box?&#8221;.</p>
+<p>A <strong>bounding box</strong> is the smallest rectangle &#8211; parallel to the coordinate axes &#8211; capable of containing a given feature.</p>
+<img alt="_images/boundingbox.png" class="inline align-center" src="_images/boundingbox.png" />
+<p>Bounding boxes are used because answering the question &#8220;is A inside B?&#8221; is very computationally intensive for polygons but very fast in the case of rectangles.  Even the most complex polygons and linestrings can be represented by a simple bounding box.</p>
+<p>Indexes have to perform quickly in order to be useful. So instead of providing exact results, as B-trees do, spatial indexes provide approximate results. The question &#8220;what lines are inside this polygon?&#8221; will be instead interpreted by a spatial index as &#8220;what lines have bounding boxes that are contained inside this polygon&#8217;s bounding box?&#8221;</p>
+<p>The actual spatial indexes implemented by various databases vary widely. The most common implementation is the <a class="reference external" href="http://en.wikipedia.org/wiki/R-tree">R-tree</a> (used in PostGIS), but there are also <a class="reference external" href="http://en.wikipedia.org/wiki/Quadtree">Quadtrees</a>, and <a class="reference external" href="http://en.wikipedia.org/wiki/Grid_(spatial_index)">grid-based indexes</a> implemented in other spatial databases.</p>
+</div>
+<div class="section" id="spatial-functions">
+<h3>Spatial Functions<a class="headerlink" href="#spatial-functions" title="Permalink to this headline">¶</a></h3>
+<p>For manipulating data during a query, an ordinary database provides <strong>functions</strong> such as concatenating strings, performing hash operations on strings, doing mathematics on numbers, and extracting information from dates.  A spatial database provides a complete set of functions for analyzing geometric components, determining spatial relationships, and manipulating geometries.  These spatial functions serve as the building block for any spatial project.</p>
+<p>The majority of all spatial functions can be grouped into one of the following five categories:</p>
+<ol class="arabic simple">
+<li><strong>Conversion</strong>: Functions that <em>convert</em> between geometries and external data formats.</li>
+<li><strong>Management</strong>: Functions that <em>manage</em> information about spatial tables and PostGIS administration.</li>
+<li><strong>Retrieval</strong>: Functions that <em>retrieve</em> properties and measurements of a Geometry.</li>
+<li><strong>Comparison</strong>: Functions that <em>compare</em> two geometries with respect to their spatial relation.</li>
+<li><strong>Generation</strong>: Functions that <em>generate</em> new geometries from others.</li>
+</ol>
+<p>The list of possible functions is very large, but a common set of functions is defined by the <a class="reference internal" href="glossary.html#term-ogc"><em class="xref std std-term">OGC</em></a> <a class="reference internal" href="glossary.html#term-sfsql"><em class="xref std std-term">SFSQL</em></a> and implemented (along with additional useful functions) by PostGIS.</p>
+</div>
+</div>
+<div class="section" id="what-is-postgis">
+<h2>What is PostGIS?<a class="headerlink" href="#what-is-postgis" title="Permalink to this headline">¶</a></h2>
+<p>PostGIS turns the <a class="reference external" href="http://www.postgresql.org/">PostgreSQL</a> Database Management System into a spatial database by adding support for the three features: spatial types, indexes, and functions.  Because it is built on PostgreSQL, PostGIS automatically inherits important &#8220;enterprise&#8221; features as well as open standards for implementation</p>
+<div class="section" id="but-what-is-postgresql">
+<h3>But what is PostgreSQL?<a class="headerlink" href="#but-what-is-postgresql" title="Permalink to this headline">¶</a></h3>
+<p>PostgreSQL is a powerful, object-relational database management system (ORDBMS). It is released under a BSD-style license and is thus free and open source software. As with many other open source programs, PostgreSQL is not controlled by any single company, but has a global community of developers and companies to develop it.</p>
+<p>PostgreSQL was designed from the very start with type extension in mind &#8211; the ability to add new data types, functions and access methods at run-time. Because of this, the PostGIS extension can be developed by a separate development team, yet still integrate very tightly into the core PostgreSQL database.</p>
+<div class="section" id="why-choose-postgresql">
+<h4>Why choose PostgreSQL?<a class="headerlink" href="#why-choose-postgresql" title="Permalink to this headline">¶</a></h4>
+<p>A common question from people familiar with open source databases is, &#8220;Why wasn&#8217;t PostGIS built on MySQL?&#8221;.</p>
+<p>PostgreSQL has:</p>
+<ul class="simple">
+<li>Proven reliability and transactional integrity by default (ACID)</li>
+<li>Careful support for SQL standards (full SQL92)</li>
+<li>Pluggable type extension and function extension</li>
+<li>Community-oriented development model</li>
+<li>No limit on column sizes (&#8220;TOAST&#8221;able tuples) to support big GIS objects</li>
+<li>Generic index structure (GiST) to allow R-Tree index</li>
+<li>Easy to add custom functions</li>
+</ul>
+<p>Combined, PostgreSQL provides a very easy development path to add new spatial types. In the proprietary world, only Illustra (now Informix Universal Server) allows such easy extension. This is no coincidence; Illustra is a proprietary re-working of the original PostgreSQL code base from the 1980&#8217;s.</p>
+<p>Because the development path for adding types to PostgreSQL was so straightforward, it made sense to start there. When MySQL released basic spatial types in version 4.1, the PostGIS team took a look at their code, and the exercise reinforced the original decision to use PostgreSQL. Because MySQL spatial objects had to be hacked on top of the string type as a special case, the MySQL code was spread over the entire code base. Development of PostGIS 0.1 took under a month. Doing a &#8220;MyGIS&#8221; 0.1 would have taken a lot longer, and as such, might never have seen the light of day.</p>
+</div>
+</div>
+<div class="section" id="why-not-shapefiles">
+<h3>Why not Shapefiles?<a class="headerlink" href="#why-not-shapefiles" title="Permalink to this headline">¶</a></h3>
+<p>The <a class="reference external" href="http://en.wikipedia.org/wiki/Shapefile">shapefile</a> (and other file formats) have been the standard way of storing and interacting with spatial data since GIS software was first written. However, these &#8220;flat&#8221; files have the following disadvantages:</p>
+<ul class="simple">
+<li><strong>Files require special software to read and write.</strong>  SQL is an abstraction for random data access and analysis. Without that abstraction, you will need to write all the access and analysis code yourself.</li>
+<li><strong>Concurrent users can cause corruption.</strong> While it&#8217;s possible to write extra code to ensure that multiple writes to the same file do not corrupt the data, by the time you have solved the problem and also solved the associated performance problem, you will have written the better part of a database system. Why not just use a standard database?</li>
+<li><strong>Complicated questions require complicated software to answer.</strong> Complicated and interesting questions (spatial joins, aggregations, etc) that are expressible in one line of SQL in the database take hundreds of lines of specialized code to answer when programming against files.</li>
+</ul>
+<p>Most users of PostGIS are setting up systems where multiple applications will be expected to access the data, so having a standard SQL access method simplifies deployment and development. Some users are working with large data sets; with files, they might be segmented into multiple files, but in a database they can be stored as a single large table.</p>
+<p>In summation, the combination of support for multiple users, complex ad hoc queries, and performance on large data sets are what sets spatial databases apart from file-based systems.</p>
+</div>
+<div class="section" id="a-brief-history-of-postgis">
+<h3>A brief history of PostGIS<a class="headerlink" href="#a-brief-history-of-postgis" title="Permalink to this headline">¶</a></h3>
+<p>In the May of 2001, <a class="reference external" href="http://www.refractions.net/">Refractions Research</a>  released the first version of PostGIS. PostGIS 0.1 had objects, indexes and a handful of functions. The result was a database suitable for storage and retrieval, but not analysis.</p>
+<p>As the number of functions increased, the need for an organizing principle became clear.  The &#8220;Simple Features for SQL&#8221; (<a class="reference internal" href="glossary.html#term-sfsql"><em class="xref std std-term">SFSQL</em></a>) specification from the Open Geospatial Consortium provided such structure with guidelines for function naming and requirements.</p>
+<p>With PostGIS support for simple analysis and spatial joins, <a class="reference external" href="http://mapserver.org/">Mapserver</a> became the first external application to provide visualization of data in the database.</p>
+<p>Over the next several years the number of PostGIS functions grew, but its power remained limited. Many of the most interesting functions (e.g., ST_Intersects(), ST_Buffer(), ST_Union()) were very difficult to code.  Writing them from scratch promised years of work.</p>
+<p>Fortunately a second project, the &#8220;Geometry Engine, Open Source&#8221; or <a class="reference external" href="http://trac.osgeo.org/geos">GEOS</a>, came along. The GEOS library provides the necessary algorithms for implementing the <a class="reference internal" href="glossary.html#term-sfsql"><em class="xref std std-term">SFSQL</em></a> specification. By linking in GEOS, PostGIS provided complete support for <a class="reference internal" href="glossary.html#term-sfsql"><em class="xref std std-term">SFSQL</em></a> by version 0.8.</p>
+<p>As PostGIS data capacity grew, another issue surfaced: the representation used to store geometry proved relatively inefficient. For small objects like points and short lines, the metadata in the representation had as much as a 300% overhead. For performance reasons, it was necessary to put the representation on a diet.  By shrinking the metadata header and required dimensions, overhead greatly reduced. In PostGIS 1.0, this new, faster, lightweight representation became the default.</p>
+<p>Recent updates of PostGIS have worked on expanding standards compliance, adding support for curve-based geometries and function signatures specified in the ISO <a class="reference internal" href="glossary.html#term-sql-mm"><em class="xref std std-term">SQL/MM</em></a> standard. Through a continued focus on performance,  PostGIS 1.4 significantly improved the speed of geometry testing routines.</p>
+</div>
+<div class="section" id="who-uses-postgis">
+<h3>Who uses PostGIS?<a class="headerlink" href="#who-uses-postgis" title="Permalink to this headline">¶</a></h3>
+<p>For a complete list of case studies, see the <a class="reference external" href="http://postgis.net/casestudy">PostGIS case studies</a> page.</p>
+<div class="section" id="institut-geographique-national-france">
+<h4>Institut Geographique National, France<a class="headerlink" href="#institut-geographique-national-france" title="Permalink to this headline">¶</a></h4>
+<p>IGN is the national mapping agency of France, and uses PostGIS to store the high resolution topographic map of the country, &#8220;BDUni&#8221;. BDUni has more than 100 million features, and is maintained by a staff of over 100 field staff who verify observations and add new mapping to the database daily. The IGN installation uses the database transactional system to ensure consistency during update processes, and a <a class="reference external" href="http://developer.postgresql.org/pgdocs/postgres/warm-standby.html">warm standby system</a> to maintain uptime in the event of a system failure.</p>
+</div>
+<div class="section" id="globexplorer">
+<h4>GlobeXplorer<a class="headerlink" href="#globexplorer" title="Permalink to this headline">¶</a></h4>
+<p>GlobeXplorer is a web-based service providing online access to petabytes of global satellite and aerial imagery. GlobeXplorer uses PostGIS to manage the metadata associated with the imagery catalogue, so queries for imagery first search the PostGIS catalogue to find the location of the relevant images, then pull the images from storage and return them to the client. In building their system, GlobeXplorer tried other spatial databases but eventually settled on PostGIS because of the great combination of price and performance it offers.</p>
+</div>
+</div>
+<div class="section" id="what-applications-support-postgis">
+<h3>What applications support PostGIS?<a class="headerlink" href="#what-applications-support-postgis" title="Permalink to this headline">¶</a></h3>
+<p>PostGIS has become a widely used spatial database, and the number of third-party programs that support storing and retrieving data using it has increased as well. The <a class="reference external" href="http://trac.osgeo.org/postgis/wiki/UsersWikiToolsSupportPostgis">programs that support PostGIS</a> include both open source and proprietary software on both server and desktop systems.</p>
+<p>The following table shows a list of some of the software that leverages PostGIS:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="52%" />
+<col width="48%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Open/Free</th>
+<th class="head">Closed/Proprietary</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><ul class="first last simple">
+<li>Loading/Extracting<ul>
+<li>Shp2Pgsql</li>
+<li>ogr2ogr</li>
+<li>Dxf2PostGIS</li>
+</ul>
+</li>
+<li>Web-Based<ul>
+<li>Mapserver</li>
+<li>GeoServer (Java-based WFS / WMS -server )</li>
+<li>SharpMap SDK - for ASP.NET 2.0</li>
+<li>MapGuide Open Source (using FDO)</li>
+</ul>
+</li>
+<li>Desktop<ul>
+<li>uDig</li>
+<li>QGIS</li>
+<li>mezoGIS</li>
+<li>OpenJUMP</li>
+<li>OpenEV</li>
+<li>SharpMap SDK for Microsoft.NET 2.0</li>
+<li>ZigGIS for ArcGIS/ArcObjects.NET</li>
+<li>GvSIG</li>
+<li>GRASS</li>
+</ul>
+</li>
+</ul>
+</td>
+<td><ul class="first last simple">
+<li>Loading/Extracting<ul>
+<li>Safe FME Desktop Translator/Converter</li>
+</ul>
+</li>
+<li>Web-Based<ul>
+<li>Ionic Red Spider (now ERDAS)</li>
+<li>Cadcorp GeognoSIS</li>
+<li>Iwan Mapserver</li>
+<li>MapDotNet Server</li>
+<li>MapGuide Enterprise (using FDO)</li>
+<li>ESRI ArcGIS Server 9.3+</li>
+</ul>
+</li>
+<li>Desktop<ul>
+<li>Cadcorp SIS</li>
+<li>Microimages TNTmips GIS</li>
+<li>ESRI ArcGIS 9.3+</li>
+<li>Manifold</li>
+<li>GeoConcept</li>
+<li>MapInfo (v10)</li>
+<li>AutoCAD Map 3D (using FDO)</li>
+</ul>
+</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+
+
+      <!-- Next/Prev -->
+      <div class="selfclear pagination-nav">
+          <div class="left"><strong>Previous</strong>: <a href="welcome.html" title="previous chapter">Welcome</a></div>
+          <div class="right"><strong>Next</strong>: <a href="installation.html" title="next chapter">Section 2: Installation</a></div>
+      </div>
+
+  </div> <!-- rightbar_main -->
+
+  <div id="rightbar_bar">
+    
+      <div id="toc" class="section">
+        <h4 class="pngfix">Page Contents</h4>
+        <ul>
+<li><a class="reference internal" href="#">Section 1: Introduction</a><ul>
+<li><a class="reference internal" href="#what-is-a-spatial-database">What is a Spatial Database?</a><ul>
+<li><a class="reference internal" href="#in-the-beginning">In the Beginning</a></li>
+<li><a class="reference internal" href="#spatial-data-types">Spatial Data Types</a></li>
+<li><a class="reference internal" href="#spatial-indexes-and-bounding-boxes">Spatial Indexes and Bounding Boxes</a></li>
+<li><a class="reference internal" href="#spatial-functions">Spatial Functions</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#what-is-postgis">What is PostGIS?</a><ul>
+<li><a class="reference internal" href="#but-what-is-postgresql">But what is PostgreSQL?</a><ul>
+<li><a class="reference internal" href="#why-choose-postgresql">Why choose PostgreSQL?</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#why-not-shapefiles">Why not Shapefiles?</a></li>
+<li><a class="reference internal" href="#a-brief-history-of-postgis">A brief history of PostGIS</a></li>
+<li><a class="reference internal" href="#who-uses-postgis">Who uses PostGIS?</a><ul>
+<li><a class="reference internal" href="#institut-geographique-national-france">Institut Geographique National, France</a></li>
+<li><a class="reference internal" href="#globexplorer">GlobeXplorer</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#what-applications-support-postgis">What applications support PostGIS?</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+        <div class="section-footer"></div>
+      </div>
+        <div class="section">
+          <h3>Continue Reading</h3>
+          <p style="margin-top:1em"><b>Previous:</b> <a href="welcome.html" title="previous chapter">Welcome</a></p>
+          <p><b>Next:</b> <a href="installation.html" title="next chapter">Section 2: Installation</a></p>
+          </ul>
+        </div>
+
+   <h4>About Boundless</h4>
+   <p>Boundless provides <a href="http://boundlessgeo.com/solutions/">commercial open source software</a> for internet mapping and geospatial application development. We are dedicated to the growth and support of open source software.</p>
+
+    <h4>License</h4>
+    <p>This work is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/3.0/">Creative Commons Non Commercial-Attribution-Share Alike 3.0 United States License</a>.  Feel free to use this material, but we ask that you please retain the Boundless branding, logos and style.</p>
+<p><a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/3.0/"><img alt="Creative Commons License" style="border-width:0" src="http://i.creativecommons.org/l/by-nc-sa/3.0/88x31.png" /></a></p>
+<!--
+<ul id="relatedlinks" class="selfclear">
+  <li class="first">
+    <a href="installation.html" title="Section 2: Installation"
+       accesskey="N">next</a></li>
+  <li>
+    <a href="welcome.html" title="Welcome"
+       accesskey="P">previous</a>|</li>
+</ul> -->
+  </div> <!-- rightbar_bar -->
+
+  </div> <!-- content -->
+  <div id="footer">
+    <footer id="colophon" class="site-footer" role="contentinfo">
+		<div class="container">
+			<div class="row">
+				<div class="span2">
+					<h5>Solutions</h5>
+					<div class="footer-solutions-menu">
+						<ul id="menu-solutions" class="menu">
+							<li><a href="http://boundlessgeo.com/solutions/">Overview</a></li>
+							<li><a href="http://boundlessgeo.com/opengeo-suite/">OpenGeo Suite</a></li>
+							<li><a href="http://boundlessgeo.com/solutions/mapmeter/">MapMeter</a></li>
+							<li><a href="http://boundlessgeo.com/solutions/solutions-software/">Software</a></li>
+							<li><a href="http://boundlessgeo.com/solutions/solutions-industry/">Industries</a></li>
+						</ul>
+					</div>
+				</div>
+				<div class="span2">
+					<h5>Resources</h5>
+					<div class="footer-resources-menu">
+						<ul id="menu-resources" class="menu">
+              <li><a href="http://boundlessgeo.com/resources/">Overview</a></li>
+							<li><a href="http://boundlessgeo.com/documentation/">Documentation</a></li>
+							<li><a href="http://boundlessgeo.com/resources/trainings/">Trainings</a></li>
+							<li><a href="http://workshops.boundlessgeo.com/">Workshops</a></li>
+							<li><a href="http://boundlessgeo.com/case-studies/">Case Studies</a></li>
+							<li><a href="http://boundlessgeo.com/resources/white-papers/">White Papers</a></li>
+						</ul>
+					</div>
+				</div>
+				<div class="span2">
+					<h5>About Us</h5>
+					<div class="footer-about-menu">
+						<ul id="menu-about-menu" class="menu">
+              <li><a href="http://boundlessgeo.com/about/">Overview</a></li>
+							<li><a href="http://boundlessgeo.com/why-boundless/">Why Boundless</a></li>
+							<li><a href="http://boundlessgeo.com/about/team/">Team</a></li>
+							<li><a href="http://boundlessgeo.com/resources/careers/">Careers</a></li>
+							<li><a href="http://boundlessgeo.com/resources/partners/">Partners</a></li>
+							<li><a href="http://boundlessgeo.com/blog/">Blog</a></li>
+							<li><a href="http://boundlessgeo.com/resources/news/">News &amp; Media</a></li>
+              <li><a href="http://boundlessgeo.com/general-information/">Contact</a></li>
+            </ul></div>
+  				</div>
+
+				<div class="span6 site-info">
+
+					<div class="row-fluid">
+						<div class="span6">
+							<h5>Contact</h5>
+							<p class="address">
+								<span>155 Water Street, Suite 4-10</span>
+								<span>Brooklyn, NY 11201</span>
+								<span>1-877-673-6436</span>
+								<span>contact@boundlessgeo.com</span>
+							</p>
+						</div>
+						<div class="span6">
+							<span class="social"><i class="twitter"></i><a href="https://twitter.com/boundlessgeo" target="_blank">Follow us on Twitter</a></span>
+							<span class="social"><i class="linkedIn"></i><a href="http://www.linkedin.com/company/boundlessgeo" target="_blank">Follow us on Linkedin</a></span>
+						</div>
+					</div>
+
+				</div>
+			</div>
+			<div class="row">
+				<div class="span12 footer-sub-menu">
+					<div class="menu-footer-menu-container">
+						<ul id="menu-footer-menu" class="menu">
+							<li><a href="http://boundlessgeo.com/terms-service/">Terms of Service</a></li>
+							<li><a href="http://boundlessgeo.com/privacy-policy/">Privacy Policy</a></li>
+							<li><a href="http://boundlessgeo.com/site-map/">Site Map</a></li>
+							<li><a href="http://boundlessgeo.com/">© Boundless</a></li>
+						</ul>
+					</div>
+				</div>
+			</div>
+		</div>
+		<a class="question btn btn-primary" href="http://boundlessgeo.com/general-information/?contact-variable=ask_a_question"><i class="bubble"></i>Ask A Question</a>
+	</footer>
+  </div><!-- footer -->
+
+</div><!-- container -->
+
+<script type="text/javascript" src="http://boundlessgeo.com/wp-content/themes/open-geo/js/dropdown.js"></script>
+<script type="text/javascript">
+var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+</script>
+<script type="text/javascript">
+try {
+var pageTracker = _gat._getTracker("UA-3879903-6");
+pageTracker._trackPageview();
+} catch(err) {}
+</script>
+
+  </body>
+</html>

@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="en-US" prefix="og: http://ogp.me/ns#">
+<head>
+  <meta charset="UTF-8">
+  
+  <title>Boundless : Introduction to PostGIS : Section 25: 3-D</title>
+
+  <link rel="profile" href="http://gmpg.org/xfn/11">
+  <link rel="stylesheet" href="http://boundlessgeo.com/wp-content/themes/open-geo/style.css" type="text/css"/>
+
+<link rel="stylesheet" id="style-css" href="http://boundlessgeo.com/wp-content/themes/open-geo/style.css?ver=3.6.1" type="text/css" media="all">
+  <link rel="stylesheet" href="_static/extra.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <!-- <link rel="stylesheet" type="text/css" href="http://opengeo.org/include/superfish/css/superfish.css" media="screen" /> -->
+
+  <script type="text/javascript" src="http://boundlessgeo.com/wordpress/wp-includes/js/jquery/jquery.js?ver=1.10.2"></script>
+  <script type="text/javascript" src="http://boundlessgeo.com/wordpress/wp-includes/js/jquery/jquery-migrate.min.js?ver=1.2.1"></script>
+
+  <script type="text/javascript">
+    var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '1.0',
+        COLLAPSE_MODINDEX: false,
+        FILE_SUFFIX: '.html'
+    };
+  </script>
+  <script type="text/javascript" src="_static/jquery.js"></script>
+  <script type="text/javascript" src="_static/underscore.js"></script>
+  <script type="text/javascript" src="_static/doctools.js"></script>
+  <script type="text/javascript" src="_static/searchtools.js"></script>
+  <script type="text/javascript" src="searchindex.js"></script>
+  <!-- 
+  <script type="text/javascript" src="http://opengeo.org/include/superfish/js/jquery-1.2.6.min.js"></script> 
+  <script type="text/javascript" src="http://opengeo.org/include/superfish/js/hoverIntent.js"></script>
+  <script type="text/javascript" src="http://opengeo.org/include/superfish/js/superfish.js"></script>
+  <script type="text/javascript" src="http://opengeo.org/include/superfish/js/supersubs.js"></script>
+  <script>
+	$(document).ready(function(){
+		$("ul.sf-menu").supersubs({
+		}).superfish();  // call supersubs first, then superfish, so that subs are
+						 // not display:none when measuring. Call before initialising
+						 // containing tabs for same reason.
+	});
+	</script>
+  -->
+  <link rel="shortcut icon" href="_static/favicon.ico"/>
+      <link rel="top" title="Introduction to PostGIS" href="index.html" />
+      <link rel="next" title="Section 26: Nearest-Neighbour Searching" href="knn.html" />
+      <link rel="prev" title="Section 24: Clustering on Indices" href="clusterindex.html" />
+
+<script type="text/javascript" src="//use.typekit.net/ijz1lwt.js"></script>
+<script type="text/javascript">try{Typekit.load();}catch(e){}</script>
+
+<!--[if lt IE 9]>
+<script src="http://boundlessgeo.com/wp-content/themes/open-geo/js/html5.js" type="text/javascript"></script>
+<![endif]-->
+
+
+</head>
+<body class="page">
+
+	<div id="wrapper">
+		<header id="masthead" class="site-header" role="banner">
+			<div class="container">
+				<a href="http://boundlessgeo.com/" rel="home" id="logo"><img src="http://boundlessgeo.com/wp-content/themes/open-geo/images/logo.png"></a>
+
+				<div class="pull-right">
+					<div class="pull-left">
+						<div class="menu-main-container">
+							<ul id="menu-main" class="menu">
+                <li class="solutions-primary menu-item menu-item-type-post_type menu-item-object-page menu-item-22"><a href="http://boundlessgeo.com/solutions/">Solutions</a></li>
+                <li class="resources-primary menu-item menu-item-type-post_type menu-item-object-page current-menu-item page_item page-item-16 current_page_item menu-item-23"><a href="http://boundlessgeo.com/resources/">Resources</a></li>
+                <li class="about-primary menu-item menu-item-type-post_type menu-item-object-page menu-item-24"><a href="http://boundlessgeo.com/about/">About</a></li>
+                <li class="support-primary menu-item menu-item-type-post_type menu-item-object-page menu-item-25"><a href="http://boundlessgeo.com/support/">Support</a></li>
+							</ul>
+						</div>
+					</div>
+					<div class="search dropdown">
+					  <a class="dropdown-toggle" data-toggle="dropdown" href="#"><i class="search-icon"></i></a>
+						  <div class="dropdown-menu" role="menu" aria-labelledby="dLabel">
+							  <form method="get" id="searchform" class="searchform" action="http://boundlessgeo.com/" role="search">
+								  <label for="s" class="screen-reader-text">Search</label>
+							  <input type="search" class="field" name="s" value="" id="s" placeholder="Search …">
+							  <input type="submit" class="submit" id="searchsubmit" value="Search">
+							  </form>
+						  </div>
+					</div>
+					<div class="download-link">
+						<ul id="menu-download-link" class="menu">
+							<li id="menu-item-5817" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-5817">
+								<a href="http://boundlessgeo.com/download/">Download</a>
+							</li>
+						</ul>
+					</div>
+				</div>
+
+			</div><!--closes container-->
+
+		</header>
+<section class="resources page-resources">
+  <div class="secondarynav">
+     <div class="container">
+       	<div class="menu-resources-container">
+	   <ul id="menu-resources" class="menu">
+              <li id="menu-item-5892" class="menu-item menu-item-type-post_type menu-item-object-page current-menu-item page_item page-item-16 current_page_item menu-item-5892"><a href="http://boundlessgeo.com/resources/" >Overview</a></li>
+              <li id="menu-item-7099" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-7099"><a href="http://boundlessgeo.com/resources/documentation/" >Documentation</a></li>
+              <li id="menu-item-5885" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-5885"><a href="http://boundlessgeo.com/resources/trainings/" >Trainings</a></li>
+              <li id="menu-item-6432" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-6432"><a href="http://workshops.boundlessgeo.com/" >Workshops</a></li>
+              <li id="menu-item-5318" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-5318"><a href="http://boundlessgeo.com/resources/case-studies/" >Case Studies</a></li>
+              <li id="menu-item-5891" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-5891"><a href="http://boundlessgeo.com/resources/white-papers/" >White Papers</a></li>
+           </ul>
+         </div>		
+      </div>
+    </div>
+</section>
+<header class="page-header">
+	<div class="container">
+		<h1 class="page-title"><a href="index.html">Introduction to PostGIS</a></h1>
+		<p>PostGIS extends PostgreSQL with robust spatial database management capabilities. <a href="http://boundlessgeo.com/solutions/solutions-software/postgis/">More info</a></p>
+	</div>
+</header><div id="pageheading"><div class="contents"><h1>Introduction to PostGIS</h1></div></div>
+
+  <div id="content" class="contents">
+  <!--
+<div id="breadcrumbs">
+  <a href="http://boundlessgeo.com/">Home</a> &raquo;
+  <a href="http://boundlessgeo.com/resources/">Resources</a> &raquo;
+  <a href="http://workshops.boundlessgeo.com/">Workshops</a> &raquo;
+  <a href="index.html">Introduction to PostGIS</a>
+  
+     &raquo; <a href="">Section 25: 3-D</a>
+</div> -->
+
+  <div id="rightbar_main">
+      
+  <div class="section" id="section-25-3-d">
+<span id="d"></span><h1>Section 25: 3-D<a class="headerlink" href="#section-25-3-d" title="Permalink to this headline">¶</a></h1>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">This section refers to many features that are only available with PostGIS 2.0 and higher.</p>
+</div>
+<div class="section" id="d-geometries">
+<h2>3-D Geometries<a class="headerlink" href="#d-geometries" title="Permalink to this headline">¶</a></h2>
+<p>So far, we have been working with 2-D geometries, with only X and Y coordinates. But PostGIS supports additional dimensions on all geometry types, a &#8220;Z&#8221; dimension to add height information and a &#8220;M&#8221; dimension for additional dimensional information (commonly time, or road-mile, or upstream-distance information) for each coordinate.</p>
+<p>For 3-D and 4-D geometries, the extra dimensions are added as extra coordinates for each vertex in the geometry, and the geometry type is enhanced to indicate how to interpret the extra dimensions. Adding the extra dimensions results in three extra possible geometry types for each geometry primitive:</p>
+<ul class="simple">
+<li>Point (a 2-D type)i is joined by PointZ, PointM and PointZM types.</li>
+<li>Linestring (a 2-D type) is joined by LinestringZ, LinestringM and LinestringZM types.</li>
+<li>Polygon (a 2-D type) is joined by PolygonZ, PolygonM and PolygonZM types.</li>
+<li>And so on.</li>
+</ul>
+<p>For well-known text (<a class="reference internal" href="glossary.html#term-wkt"><em class="xref std std-term">WKT</em></a>) representation, the format for higher dimensional geometries is given by the ISO SQL/MM specification. The extra dimensionality information is simply added to the text string after the type name, and the extra coordinates added after the X/Y information. For example:</p>
+<ul class="simple">
+<li>POINT ZM (1 2 3 4)</li>
+<li>LINESTRING M (1 1 0, 1 2 0, 1 3 1, 2 2 0)</li>
+<li>POLYGON Z ((0 0 0, 0 1 0, 1 1 0, 1 0 0, 0 0 0))</li>
+</ul>
+<p>The ST_AsText() function will return the above representations when dealing with 3-D and 4-D geometries.</p>
+<p>For well-known binary (<a class="reference internal" href="glossary.html#term-wkb"><em class="xref std std-term">WKB</em></a>) representation, the format for higher dimensional geometries is given by the ISO SQL/MM specification. The BNF form of the format is available from <a class="reference external" href="http://svn.osgeo.org/postgis/trunk/doc/bnf-wkb.txt">http://svn.osgeo.org/postgis/trunk/doc/bnf-wkb.txt</a>.</p>
+<p>In addition to higher-dimensional forms of the standard types, PostGIS includes a few new types that make sense in a 3-D space:</p>
+<ul class="simple">
+<li>The TIN type allows you to model triangular meshes as rows in your database.</li>
+<li>The POLYHEDRALSURFACE allows you to model volumetric objects in your database.</li>
+</ul>
+<p>Since both these types are for modelling 3-D objects, it only really makes sense to use the Z variants.  An example of a POLYHEDRALSURFACE Z would be the 1 unit cube:</p>
+<div class="highlight-python"><pre>POLYHEDRALSURFACE Z (
+  ((0 0 0, 0 1 0, 1 1 0, 1 0 0, 0 0 0)),
+  ((0 0 0, 0 1 0, 0 1 1, 0 0 1, 0 0 0)),
+  ((0 0 0, 1 0 0, 1 0 1, 0 0 1, 0 0 0)),
+  ((1 1 1, 1 0 1, 0 0 1, 0 1 1, 1 1 1)),
+  ((1 1 1, 1 0 1, 1 0 0, 1 1 0, 1 1 1)),
+  ((1 1 1, 1 1 0, 0 1 0, 0 1 1, 1 1 1))
+)</pre>
+</div>
+</div>
+<div class="section" id="d-functions">
+<h2>3-D Functions<a class="headerlink" href="#d-functions" title="Permalink to this headline">¶</a></h2>
+<p>There are a number of functions built to calculate relationships between 3-D objects:</p>
+<ul class="simple">
+<li>ST_3DClosestPoint — Returns the 3-dimensional point on g1 that is closest to g2. This is the first point of the 3D shortest line.</li>
+<li>ST_3DDistance — For geometry type Returns the 3-dimensional cartesian minimum distance (based on spatial ref) between two geometries in projected units.</li>
+<li>ST_3DDWithin — For 3d (z) geometry type Returns true if two geometries 3d distance is within number of units.</li>
+<li>ST_3DDFullyWithin — Returns true if all of the 3D geometries are within the specified distance of one another.</li>
+<li>ST_3DIntersects — Returns TRUE if the Geometries &#8220;spatially intersect&#8221; in 3d - only for points and linestrings</li>
+<li>ST_3DLongestLine — Returns the 3-dimensional longest line between two geometries</li>
+<li>ST_3DMaxDistance — For geometry type Returns the 3-dimensional cartesian maximum distance (based on spatial ref) between two geometries in projected units.</li>
+<li>ST_3DShortestLine — Returns the 3-dimensional shortest line between two geometries</li>
+</ul>
+<p>For example, we can calculate the distance between our unit cube and a point using the ST_3DDistance function:</p>
+<div class="highlight-sql"><div class="highlight"><pre><span class="c1">-- This is really the distance between the top corner</span>
+<span class="c1">-- and the point.</span>
+<span class="k">SELECT</span> <span class="n">ST_3DDistance</span><span class="p">(</span>
+  <span class="s1">&#39;POLYHEDRALSURFACE Z (</span>
+<span class="s1">    ((0 0 0, 0 1 0, 1 1 0, 1 0 0, 0 0 0)),</span>
+<span class="s1">    ((0 0 0, 0 1 0, 0 1 1, 0 0 1, 0 0 0)),</span>
+<span class="s1">    ((0 0 0, 1 0 0, 1 0 1, 0 0 1, 0 0 0)),</span>
+<span class="s1">    ((1 1 1, 1 0 1, 0 0 1, 0 1 1, 1 1 1)),</span>
+<span class="s1">    ((1 1 1, 1 0 1, 1 0 0, 1 1 0, 1 1 1)),</span>
+<span class="s1">    ((1 1 1, 1 1 0, 0 1 0, 0 1 1, 1 1 1))</span>
+<span class="s1">  )&#39;</span><span class="p">::</span><span class="n">geometry</span><span class="p">,</span>
+  <span class="s1">&#39;POINT Z (2 2 2)&#39;</span><span class="p">::</span><span class="n">geometry</span>
+<span class="p">);</span>
+
+<span class="c1">-- So here&#39;s a shorter form.</span>
+<span class="k">SELECT</span> <span class="n">ST_3DDistance</span><span class="p">(</span>
+  <span class="s1">&#39;POINT Z (1 1 1)&#39;</span><span class="p">::</span><span class="n">geometry</span><span class="p">,</span>
+  <span class="s1">&#39;POINT Z (2 2 2)&#39;</span><span class="p">::</span><span class="n">geometry</span>
+<span class="p">);</span>
+
+<span class="c1">-- Both return 1.73205080756888 == sqrt(3) as expected</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="n-d-indexes">
+<h2>N-D Indexes<a class="headerlink" href="#n-d-indexes" title="Permalink to this headline">¶</a></h2>
+<p>Once you have data in higher dimensions it may make sense to index it. However, you should think carefully about the distribution of your data in all dimensions before applying a multi-dimensional index.</p>
+<p>Indexes are only useful when they allow the database to drastically reduce the number of return rows as a result of a WHERE condition. For a higher dimension index to be useful, the data must cover a wide range of that dimension, relative to the kinds of queries you are constructing.</p>
+<ul class="simple">
+<li>A set of DEM points would probably be a <em>poor</em> candidate for a 3-D index, since the queries would usually be extracting a 2-D box of points, and rarely attempting to select a Z-slice of points.</li>
+<li>A set of GPS traces in X/Y/T space might be a <em>good</em> candidate for a 3-D index, if the GPS tracks overlapped each other frequently in all dimensions (for example, driving the same route over and over at different times), since there would be large variability in all dimensions of the data set.</li>
+</ul>
+<p>You can create a multi-dimensional index on data of any dimensionality (even mixed dimensionality). For example, to create a multi-dimensional index on the <tt class="docutils literal"><span class="pre">nyc_streets</span></tt> table,</p>
+<div class="highlight-sql"><div class="highlight"><pre><span class="k">CREATE</span> <span class="k">INDEX</span> <span class="n">nyc_streets_gix_nd</span> <span class="k">ON</span> <span class="n">nyc_streets</span>
+<span class="k">USING</span> <span class="n">GIST</span> <span class="p">(</span><span class="n">geom</span> <span class="n">gist_geometry_ops_nd</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>The <tt class="docutils literal"><span class="pre">gist_geometry_ops_nd</span></tt> parameter tells PostGIS to use the N-D index instead of the standard 2-D index.</p>
+<p>Once you have the index built, you can use it in queries with the <tt class="docutils literal"><span class="pre">&amp;&amp;&amp;</span></tt> index operator. <tt class="docutils literal"><span class="pre">&amp;&amp;&amp;</span></tt> has the same semantics as <tt class="docutils literal"><span class="pre">&amp;&amp;</span></tt>, &#8220;bounding boxes interact&#8221;, but applies those semantics using all the dimensions of the input geometries. Geometries with mis-matching dimensionality do not interact.</p>
+<div class="highlight-sql"><div class="highlight"><pre><span class="c1">-- Returns true (both 3-D on the zero plane)</span>
+<span class="k">SELECT</span> <span class="s1">&#39;POINT Z (1 1 0)&#39;</span><span class="p">::</span><span class="n">geometry</span> <span class="o">&amp;&amp;&amp;</span>
+       <span class="s1">&#39;POLYGON ((0 0 0, 0 2 0, 2 2 0, 2 0 0, 0 0 0))&#39;</span><span class="p">::</span><span class="n">geometry</span><span class="p">;</span>
+
+<span class="c1">-- Returns false (one 2-D one 3-D)</span>
+<span class="k">SELECT</span> <span class="s1">&#39;POINT Z (1 1 1)&#39;</span><span class="p">::</span><span class="n">geometry</span> <span class="o">&amp;&amp;&amp;</span>
+       <span class="s1">&#39;POLYGON ((0 0, 0 2, 2 2, 2 0, 0 0))&#39;</span><span class="p">::</span><span class="n">geometry</span><span class="p">;</span>
+
+<span class="c1">-- Returns true (the volume around the linestring interacts with the point)</span>
+<span class="k">SELECT</span> <span class="s1">&#39;LINESTRING Z(0 0 0, 1 1 1)&#39;</span><span class="p">::</span><span class="n">geometry</span> <span class="o">&amp;&amp;&amp;</span>
+       <span class="s1">&#39;POINT(0 1 1)&#39;</span><span class="p">::</span><span class="n">geometry</span><span class="p">;</span>
+</pre></div>
+</div>
+<p>To search the <tt class="docutils literal"><span class="pre">nyc_streets</span></tt> table using the N-D index, just replace the usual <tt class="docutils literal"><span class="pre">&amp;&amp;</span></tt> 2-D index operator with the <tt class="docutils literal"><span class="pre">&amp;&amp;&amp;</span></tt> operator.</p>
+<div class="highlight-sql"><div class="highlight"><pre><span class="c1">-- N-D index operator</span>
+<span class="k">SELECT</span> <span class="n">gid</span><span class="p">,</span> <span class="n">name</span>
+<span class="k">FROM</span> <span class="n">nyc_streets</span>
+<span class="k">WHERE</span> <span class="n">geom</span> <span class="o">&amp;&amp;&amp;</span>
+      <span class="n">ST_SetSRID</span><span class="p">(</span><span class="s1">&#39;LINESTRING(586785 4492901,587561 4493037)&#39;</span><span class="p">,</span><span class="mi">26918</span><span class="p">);</span>
+
+<span class="c1">-- 2-D index operator</span>
+<span class="k">SELECT</span> <span class="n">gid</span><span class="p">,</span> <span class="n">name</span>
+<span class="k">FROM</span> <span class="n">nyc_streets</span>
+<span class="k">WHERE</span> <span class="n">geom</span> <span class="o">&amp;&amp;</span>
+      <span class="n">ST_SetSRID</span><span class="p">(</span><span class="s1">&#39;LINESTRING(586785 4492901,587561 4493037)&#39;</span><span class="p">,</span><span class="mi">26918</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>The results should be the same. In general the N-D index is very slightly slower than the 2-D index, so only use the N-D index where you are certain that N-D queries will improve the selectivity of your queries.</p>
+</div>
+</div>
+
+
+      <!-- Next/Prev -->
+      <div class="selfclear pagination-nav">
+          <div class="left"><strong>Previous</strong>: <a href="clusterindex.html" title="previous chapter">Section 24: Clustering on Indices</a></div>
+          <div class="right"><strong>Next</strong>: <a href="knn.html" title="next chapter">Section 26: Nearest-Neighbour Searching</a></div>
+      </div>
+
+  </div> <!-- rightbar_main -->
+
+  <div id="rightbar_bar">
+    
+      <div id="toc" class="section">
+        <h4 class="pngfix">Page Contents</h4>
+        <ul>
+<li><a class="reference internal" href="#">Section 25: 3-D</a><ul>
+<li><a class="reference internal" href="#d-geometries">3-D Geometries</a></li>
+<li><a class="reference internal" href="#d-functions">3-D Functions</a></li>
+<li><a class="reference internal" href="#n-d-indexes">N-D Indexes</a></li>
+</ul>
+</li>
+</ul>
+
+        <div class="section-footer"></div>
+      </div>
+        <div class="section">
+          <h3>Continue Reading</h3>
+          <p style="margin-top:1em"><b>Previous:</b> <a href="clusterindex.html" title="previous chapter">Section 24: Clustering on Indices</a></p>
+          <p><b>Next:</b> <a href="knn.html" title="next chapter">Section 26: Nearest-Neighbour Searching</a></p>
+          </ul>
+        </div>
+
+   <h4>About Boundless</h4>
+   <p>Boundless provides <a href="http://boundlessgeo.com/solutions/">commercial open source software</a> for internet mapping and geospatial application development. We are dedicated to the growth and support of open source software.</p>
+
+    <h4>License</h4>
+    <p>This work is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/3.0/">Creative Commons Non Commercial-Attribution-Share Alike 3.0 United States License</a>.  Feel free to use this material, but we ask that you please retain the Boundless branding, logos and style.</p>
+<p><a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/3.0/"><img alt="Creative Commons License" style="border-width:0" src="http://i.creativecommons.org/l/by-nc-sa/3.0/88x31.png" /></a></p>
+<!--
+<ul id="relatedlinks" class="selfclear">
+  <li class="first">
+    <a href="knn.html" title="Section 26: Nearest-Neighbour Searching"
+       accesskey="N">next</a></li>
+  <li>
+    <a href="clusterindex.html" title="Section 24: Clustering on Indices"
+       accesskey="P">previous</a>|</li>
+</ul> -->
+  </div> <!-- rightbar_bar -->
+
+  </div> <!-- content -->
+  <div id="footer">
+    <footer id="colophon" class="site-footer" role="contentinfo">
+		<div class="container">
+			<div class="row">
+				<div class="span2">
+					<h5>Solutions</h5>
+					<div class="footer-solutions-menu">
+						<ul id="menu-solutions" class="menu">
+							<li><a href="http://boundlessgeo.com/solutions/">Overview</a></li>
+							<li><a href="http://boundlessgeo.com/opengeo-suite/">OpenGeo Suite</a></li>
+							<li><a href="http://boundlessgeo.com/solutions/mapmeter/">MapMeter</a></li>
+							<li><a href="http://boundlessgeo.com/solutions/solutions-software/">Software</a></li>
+							<li><a href="http://boundlessgeo.com/solutions/solutions-industry/">Industries</a></li>
+						</ul>
+					</div>
+				</div>
+				<div class="span2">
+					<h5>Resources</h5>
+					<div class="footer-resources-menu">
+						<ul id="menu-resources" class="menu">
+              <li><a href="http://boundlessgeo.com/resources/">Overview</a></li>
+							<li><a href="http://boundlessgeo.com/documentation/">Documentation</a></li>
+							<li><a href="http://boundlessgeo.com/resources/trainings/">Trainings</a></li>
+							<li><a href="http://workshops.boundlessgeo.com/">Workshops</a></li>
+							<li><a href="http://boundlessgeo.com/case-studies/">Case Studies</a></li>
+							<li><a href="http://boundlessgeo.com/resources/white-papers/">White Papers</a></li>
+						</ul>
+					</div>
+				</div>
+				<div class="span2">
+					<h5>About Us</h5>
+					<div class="footer-about-menu">
+						<ul id="menu-about-menu" class="menu">
+              <li><a href="http://boundlessgeo.com/about/">Overview</a></li>
+							<li><a href="http://boundlessgeo.com/why-boundless/">Why Boundless</a></li>
+							<li><a href="http://boundlessgeo.com/about/team/">Team</a></li>
+							<li><a href="http://boundlessgeo.com/resources/careers/">Careers</a></li>
+							<li><a href="http://boundlessgeo.com/resources/partners/">Partners</a></li>
+							<li><a href="http://boundlessgeo.com/blog/">Blog</a></li>
+							<li><a href="http://boundlessgeo.com/resources/news/">News &amp; Media</a></li>
+              <li><a href="http://boundlessgeo.com/general-information/">Contact</a></li>
+            </ul></div>
+  				</div>
+
+				<div class="span6 site-info">
+
+					<div class="row-fluid">
+						<div class="span6">
+							<h5>Contact</h5>
+							<p class="address">
+								<span>155 Water Street, Suite 4-10</span>
+								<span>Brooklyn, NY 11201</span>
+								<span>1-877-673-6436</span>
+								<span>contact@boundlessgeo.com</span>
+							</p>
+						</div>
+						<div class="span6">
+							<span class="social"><i class="twitter"></i><a href="https://twitter.com/boundlessgeo" target="_blank">Follow us on Twitter</a></span>
+							<span class="social"><i class="linkedIn"></i><a href="http://www.linkedin.com/company/boundlessgeo" target="_blank">Follow us on Linkedin</a></span>
+						</div>
+					</div>
+
+				</div>
+			</div>
+			<div class="row">
+				<div class="span12 footer-sub-menu">
+					<div class="menu-footer-menu-container">
+						<ul id="menu-footer-menu" class="menu">
+							<li><a href="http://boundlessgeo.com/terms-service/">Terms of Service</a></li>
+							<li><a href="http://boundlessgeo.com/privacy-policy/">Privacy Policy</a></li>
+							<li><a href="http://boundlessgeo.com/site-map/">Site Map</a></li>
+							<li><a href="http://boundlessgeo.com/">© Boundless</a></li>
+						</ul>
+					</div>
+				</div>
+			</div>
+		</div>
+		<a class="question btn btn-primary" href="http://boundlessgeo.com/general-information/?contact-variable=ask_a_question"><i class="bubble"></i>Ask A Question</a>
+	</footer>
+  </div><!-- footer -->
+
+</div><!-- container -->
+
+<script type="text/javascript" src="http://boundlessgeo.com/wp-content/themes/open-geo/js/dropdown.js"></script>
+<script type="text/javascript">
+var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+</script>
+<script type="text/javascript">
+try {
+var pageTracker = _gat._getTracker("UA-3879903-6");
+pageTracker._trackPageview();
+} catch(err) {}
+</script>
+
+  </body>
+</html>
