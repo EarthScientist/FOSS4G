@@ -1,3 +1,7 @@
+# POST GIS TUTORIAL FROM THE WORKSHOP
+http://workshops.boundlessgeo.com/postgis-intro/
+
+
 Section 11:
 
 SELECT ST_AsText(geom)
@@ -19,6 +23,13 @@ WHERE ST_DWithin(geom, ST_GeomFromText('POINT(586782 4504216)', 0), 50 );
 
 # # # #
 
-SELECT n.name, s.name
+SELECT s.name
 FROM nyc_subway_stations AS s
-JOIN 
+JOIN nyc_neighborhoods AS n
+ON ST_Intersects( s.geom, n.geom )
+WHERE n.name = 'Little Italy';
+
+
+
+
+

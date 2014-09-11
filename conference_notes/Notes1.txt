@@ -10,3 +10,33 @@
 # 10 am session on the Forest Mapping and Raster Viz
 
 
+# PCIC Session on High res spatiotemporal data:
+Check out pydap, **ncwms(py)**, pdp(py) -- THEY WROTE THE ENTIRE BACKEND IN PYTHON
+They are using OpenDap protocol for the web services
+
+- using modified ncwms with postgis db behind the scenes
+- THey are using BCSD for the downscaling algorithms I wonder if they have published that code... (collabo?)
+
+- we should really be doing something with this group
+
+
+# GIS in NODE.JS
+
+I think this guy went to clark.
+
+
+# Tileserver on NodeJS
+Some tech on Node
+nodeMapnik - rendering C++ lib
+They are using REDIS
+TURF
+Shapely.js
+
+
+# SARA NOVOTONY 
+
+http://juristr.com/blog/2012/10/hrt-humility-respect-and-trust/
+
+
+
+
